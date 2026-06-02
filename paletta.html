@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paletta — Colour System Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="paletta.css">
+  <script src="https://cdn.jsdelivr.net/npm/culori@3/bundled/culori.min.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="wordmark">Paletta</div>
+      <h1><strong>Colour</strong> System<br>Generator</h1>
+      <p class="header-sub">One anchor colour. A complete six-role UI system with rules for where each colour belongs.</p>
+    </div>
+    <div class="input-section">
+      <div class="color-input-row">
+        <span class="color-input-label">Primary</span>
+        <div class="swatch-wrap" id="swatchWrap">
+          <div class="swatch-face" id="swatchFace"></div>
+          <input type="color" id="colorPicker" value="#c4522a" title="Pick primary colour">
+        </div>
+        <div class="hex-field">
+          <span class="hash">#</span>
+          <input type="text" id="hexInput" value="c4522a" placeholder="c4522a" maxlength="6" spellcheck="false" autocomplete="off">
+        </div>
+        <button class="gen-btn" id="genBtn">Generate System</button>
+      </div>
+      <div class="color-input-row" id="secRow" style="display:none">
+        <span class="color-input-label">Secondary</span>
+        <div class="swatch-wrap" id="swatchWrap2">
+          <div class="swatch-face" id="swatchFace2"></div>
+          <input type="color" id="colorPicker2" value="#2a6dc4" title="Pick secondary colour">
+        </div>
+        <div class="hex-field">
+          <span class="hash">#</span>
+          <input type="text" id="hexInput2" value="2a6dc4" placeholder="2a6dc4" maxlength="6" spellcheck="false" autocomplete="off">
+        </div>
+        <button class="sec-remove" id="secRemove" title="Remove secondary colour">×</button>
+      </div>
+      <button class="add-sec-btn" id="addSecBtn">+ Add secondary colour</button>
+    </div>
+  </div>
+
+  <!-- Colour Role Cards -->
+  <div class="section-label">Colour Roles</div>
+  <div class="palette-grid" id="paletteGrid"></div>
+
+  <!-- Wireframe Page Preview -->
+  <div class="section-label">Page Preview</div>
+  <div class="preview-tabs">
+    <button class="preview-tab active" data-tab="dark">Dark</button>
+    <button class="preview-tab" data-tab="light">Light</button>
+  </div>
+  <div class="preview-wrap" id="pagePreview"></div>
+  <div class="preview-wrap" id="lightPreview" style="display:none"></div>
+
+  <!-- Brand Mockups — Poster Cards -->
+  <div class="section-label">Brand Mockups</div>
+  <div class="poster-row" id="posterCards"></div>
+
+  <!-- Brand Sheet -->
+  <div class="section-label">Brand Sheet</div>
+  <div class="brand-grid" id="brandGrid"></div>
+
+  <!-- Export -->
+  <div class="export-bar">
+    <div class="export-info">
+      <strong>Export this system</strong>
+      <span>Copy as CSS variables or a JSON object</span>
+    </div>
+    <div class="export-btns">
+      <button class="export-btn" id="exportCssBtn">Copy CSS</button>
+      <button class="export-btn" id="exportJsonBtn">Copy JSON</button>
+      <button class="export-btn export-btn-dl" id="dlCssBtn">↓ CSS</button>
+      <button class="export-btn export-btn-dl" id="dlJsonBtn">↓ JSON</button>
+      <button class="export-btn export-btn-dl" id="dlPngBtn">↓ PNG</button>
+    </div>
+  </div>
+
+</div>
+
+<button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+  <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+  </svg>
+  <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+</button>
+
+<div class="page-footer">Pick any colour — Paletta derives the system.</div>
+<div class="toast" id="toast"></div>
+
+<script src="paletta.js"></script>
+</body>
+</html>
