@@ -465,3 +465,22 @@ body.light .export-btn-dl{color:var(--text2)}
   color:var(--text3);
   letter-spacing:.04em;
 }
+
+/* ── Mobile ── */
+@media(max-width:600px){
+  .header{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:28px;
+    padding:40px 0 36px;
+  }
+  .color-input-row{flex-wrap:wrap}
+  .gen-btn{width:100%;margin-top:4px}
+  .add-sec-btn,.input-note{margin-left:0}
+}
+@media(max-width:480px){
+  .pv-split{grid-template-columns:1fr}
+  .pv-split-img{display:none}
+  .pv-cards{grid-template-columns:repeat(2,1fr)}
+  .export-bar{flex-direction:column;align-items:flex-start}
+}
