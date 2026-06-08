@@ -144,27 +144,27 @@ function renderPreview(p){
   const footerStrip=p.secondary||p.deep;
 
   frame.innerHTML=`
-    <div class="pv-nav" style="background:${p.bgDark}">
-      <div class="pv-nav-logo" style="background:${p.light}"></div>
+    <div class="pv-nav" style="background:${p.bgDark}" ${ci('Background',p.bgDark)}>
+      <div class="pv-nav-logo" style="background:${p.light}" ${ci('Light',p.light)}></div>
       <div class="pv-nav-links">
         ${[1,2,3].map(()=>`<div class="pv-nav-link" style="background:${tod}"></div>`).join('')}
       </div>
-      <div class="pv-nav-cta" style="background:${navCta}"></div>
+      <div class="pv-nav-cta" style="background:${navCta}" ${ci(p.secondary?'Secondary':'Primary',navCta)}></div>
     </div>
 
-    <div class="pv-hero" style="background:${p.bgDark}">
-      <div class="pv-hero-tag" style="background:${p.primary}"></div>
+    <div class="pv-hero" style="background:${p.bgDark}" ${ci('Background',p.bgDark)}>
+      <div class="pv-hero-tag" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
       <div class="pv-hero-h1a" style="background:${tod}"></div>
-      <div class="pv-hero-h1b" style="background:${p.light}"></div>
+      <div class="pv-hero-h1b" style="background:${p.light}" ${ci('Light',p.light)}></div>
       <div class="pv-hero-p" style="background:${tod};width:58%"></div>
       <div class="pv-hero-p" style="background:${tod};width:44%"></div>
       <div class="pv-btns">
-        <div class="pv-btn" style="background:${p.primary}"></div>
+        <div class="pv-btn" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
         <div class="pv-btn pv-btn-ghost" style="background:${tod};border:1px solid ${tod}"></div>
       </div>
     </div>
 
-    <div class="pv-quote" style="background:${p.primary}">
+    <div class="pv-quote" style="background:${p.primary}" ${ci('Primary',p.primary)}>
       <div class="pv-quote-eyebrow"></div>
       <div class="pv-quote-line"></div>
       <div class="pv-quote-line" style="width:80%"></div>
@@ -172,19 +172,19 @@ function renderPreview(p){
       <div class="pv-quote-attr"></div>
     </div>
 
-    <div class="pv-content" style="background:${p.bgLight}">
-      <div class="pv-content-head" style="background:${p.muted}"></div>
+    <div class="pv-content" style="background:${p.bgLight}" ${ci('Surface',p.bgLight)}>
+      <div class="pv-content-head" style="background:${p.muted}" ${ci('Muted',p.muted)}></div>
       <div class="pv-cards">
         ${[1,2,3].map(()=>`
           <div class="pv-card" style="background:#fff;border-color:${p.bgDark}18">
-            <div class="pv-card-img" style="background:${p.primary}"></div>
+            <div class="pv-card-img" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
             <div class="pv-card-line" style="background:${p.bgDark}"></div>
             <div class="pv-card-line-sm" style="background:${p.muted}"></div>
           </div>`).join('')}
       </div>
     </div>
 
-    <div class="pv-split" style="background:${p.bgLight};border-top:1px solid ${ra(p.bgDark,.08)}">
+    <div class="pv-split" style="background:${p.bgLight};border-top:1px solid ${ra(p.bgDark,.08)}" ${ci('Surface',p.bgLight)}>
       <div class="pv-split-text">
         <div style="height:5px;background:${p.primary};opacity:.2;border-radius:3px;width:44%;margin-bottom:10px"></div>
         <div style="height:8px;background:${p.bgDark};opacity:.7;border-radius:3px;width:88%;margin-bottom:4px"></div>
@@ -197,15 +197,15 @@ function renderPreview(p){
       <div class="pv-split-img" style="background:${ra(p.muted,.18)}"></div>
     </div>
 
-    <div class="pv-deep" style="background:${p.deep}">
+    <div class="pv-deep" style="background:${p.deep}" ${ci('Deep',p.deep)}>
       <div style="height:7px;background:${w(.82)};border-radius:3px;width:52%;margin-bottom:5px"></div>
       <div style="height:7px;background:${w(.5)};border-radius:3px;width:36%;margin-bottom:12px"></div>
       <div style="height:4px;background:${w(.26)};border-radius:2px;width:80%;margin-bottom:4px"></div>
       <div style="height:4px;background:${w(.18)};border-radius:2px;width:60%"></div>
     </div>
 
-    <div class="pv-footer-strip" style="background:${footerStrip}"></div>
-    <div class="pv-footer" style="background:${p.bgDark}">
+    <div class="pv-footer-strip" style="background:${footerStrip}" ${ci(p.secondary?'Secondary':'Deep',footerStrip)}></div>
+    <div class="pv-footer" style="background:${p.bgDark}" ${ci('Background',p.bgDark)}>
       <div class="pv-footer-logo" style="background:#fff"></div>
       <div class="pv-footer-links">
         ${[1,2,3].map(()=>`<div class="pv-footer-link" style="background:#fff"></div>`).join('')}
@@ -224,21 +224,21 @@ function renderLightPreview(p){
 
   frame.innerHTML=`
     <div class="pv-nav" style="background:#fff;border-bottom:1px solid ${d(.07)}">
-      <div class="pv-nav-logo" style="background:${p.primary}"></div>
+      <div class="pv-nav-logo" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
       <div class="pv-nav-links">
         ${[1,2,3].map(()=>`<div class="pv-nav-link" style="background:${d(.22)}"></div>`).join('')}
       </div>
-      <div class="pv-nav-cta" style="background:${navCta}"></div>
+      <div class="pv-nav-cta" style="background:${navCta}" ${ci(p.secondary?'Secondary':'Primary',navCta)}></div>
     </div>
 
     <div class="pv-hero" style="background:#fff">
       <div class="pv-hero-tag" style="background:${ra(p.primary,.18)};border-radius:100px"></div>
       <div class="pv-hero-h1a" style="background:${d(.72)}"></div>
-      <div class="pv-hero-h1b" style="background:${p.primary};opacity:.7"></div>
+      <div class="pv-hero-h1b" style="background:${p.primary};opacity:.7" ${ci('Primary',p.primary)}></div>
       <div class="pv-hero-p" style="background:${d(.18)};width:58%"></div>
       <div class="pv-hero-p" style="background:${d(.18)};width:44%"></div>
       <div class="pv-btns">
-        <div class="pv-btn" style="background:${p.primary}"></div>
+        <div class="pv-btn" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
         <div class="pv-btn" style="background:transparent;border:1.5px solid ${d(.16)};opacity:.7"></div>
       </div>
     </div>
@@ -247,19 +247,19 @@ function renderLightPreview(p){
       ${[1,2,3].map((_,i)=>`<div style="flex:${[5,4,6][i]};height:5px;border-radius:3px;background:${ra(p.primary,.38)}"></div>`).join('')}
     </div>
 
-    <div class="pv-content" style="background:${p.bgLight}">
+    <div class="pv-content" style="background:${p.bgLight}" ${ci('Surface',p.bgLight)}>
       <div class="pv-content-head" style="background:${d(.28)}"></div>
       <div class="pv-cards">
         ${[1,2,3].map(()=>`
           <div class="pv-card" style="background:#fff;border-color:${d(.08)}">
             <div class="pv-card-img" style="background:${p.primary};opacity:.18"></div>
             <div class="pv-card-line" style="background:${d(.65)}"></div>
-            <div class="pv-card-line-sm" style="background:${p.muted}"></div>
+            <div class="pv-card-line-sm" style="background:${p.muted}" ${ci('Muted',p.muted)}></div>
           </div>`).join('')}
       </div>
     </div>
 
-    <div class="pv-quote" style="background:${p.primary}">
+    <div class="pv-quote" style="background:${p.primary}" ${ci('Primary',p.primary)}>
       <div class="pv-quote-eyebrow"></div>
       <div class="pv-quote-line"></div>
       <div class="pv-quote-line" style="width:74%"></div>
@@ -280,8 +280,8 @@ function renderLightPreview(p){
       </div>
     </div>
 
-    <div class="pv-footer-strip" style="background:${footerStrip}"></div>
-    <div class="pv-footer" style="background:${p.bgDark}">
+    <div class="pv-footer-strip" style="background:${footerStrip}" ${ci(p.secondary?'Secondary':'Deep',footerStrip)}></div>
+    <div class="pv-footer" style="background:${p.bgDark}" ${ci('Background',p.bgDark)}>
       <div class="pv-footer-logo" style="background:#fff"></div>
       <div class="pv-footer-links">
         ${[1,2,3].map(()=>`<div class="pv-footer-link" style="background:#fff"></div>`).join('')}
@@ -292,6 +292,9 @@ function renderLightPreview(p){
 // ── Poster cards & brand sheet ────────────────────────────────────────
 
 function ra(hex,a){const{r,g,b}=hexToRgb(hex);return`rgba(${r},${g},${b},${a})`}
+
+// Tag a coloured block so the hover peek can reveal its role + hex
+function ci(label,hex){return hex?`data-ci="${label}|${hex.toString().toUpperCase()}"`:'';}
 
 function makeArt(p,v){
   const s=[
@@ -717,6 +720,39 @@ document.querySelectorAll('.preview-tab').forEach(btn=>{
     document.getElementById('lightPreview').style.display=tab==='light'?'':'none';
   });
 });
+
+// ── Preview colour peek (hover a block to reveal its role + hex) ─────
+(function(){
+  const tip=document.createElement('div');
+  tip.className='pv-peek';
+  document.body.appendChild(tip);
+  let raf=null,x=0,y=0,cur=null;
+  const place=()=>{raf=null;tip.style.left=x+'px';tip.style.top=y+'px';};
+  document.querySelectorAll('.preview-wrap').forEach(wrap=>{
+    wrap.addEventListener('mousemove',e=>{
+      const el=e.target.closest('[data-ci]');
+      if(!el){tip.classList.remove('show');cur=null;return;}
+      const key=el.getAttribute('data-ci');
+      if(key!==cur){
+        cur=key;
+        const [label,hex]=key.split('|');
+        tip.innerHTML=`<span class="pv-peek-dot" style="background:${hex}"></span><span class="pv-peek-name">${label}</span><span class="pv-peek-hex">${hex}</span>`;
+        tip.classList.add('show');
+      }
+      x=e.clientX+14;y=e.clientY+16;
+      if(!raf) raf=requestAnimationFrame(place);
+    });
+    wrap.addEventListener('mouseleave',()=>{tip.classList.remove('show');cur=null;});
+    wrap.addEventListener('click',e=>{
+      const el=e.target.closest('[data-ci]');
+      if(!el) return;
+      const hex=el.getAttribute('data-ci').split('|')[1];
+      navigator.clipboard?.writeText(hex);
+      tip.classList.add('copied');
+      setTimeout(()=>tip.classList.remove('copied'),650);
+    });
+  });
+})();
 
 // ── Theme toggle ─────────────────────────────────────────────────────
 
