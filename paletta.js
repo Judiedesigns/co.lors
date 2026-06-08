@@ -60,8 +60,10 @@ function generatePalette(anchorHex){
   const l=isNaN(ok.l)?0.5:(ok.l||0);
   const c=isNaN(ok.c)?0:(ok.c||0);
   const h=isNaN(ok.h)?0:(ok.h||0);
-  const aL=clamp(l,0.50,0.62);
-  const aC=clamp(c,0,0.20);
+  // Preserve the anchor's true lightness & chroma — only nudge at extremes so
+  // a bright yellow stays a bright yellow instead of being flattened to mid gold.
+  const aL=clamp(l,0.42,0.90);
+  const aC=clamp(c,0,0.37);
   return{
     bgDark: toHex(0.09,  clamp(c*.35,0,0.040), h),
     bgLight:toHex(0.97,  clamp(c*.10,0,0.016), h),
@@ -78,8 +80,8 @@ function generateSecondaryPalette(anchorHex){
   const l=isNaN(ok.l)?0.5:(ok.l||0);
   const c=isNaN(ok.c)?0:(ok.c||0);
   const h=isNaN(ok.h)?0:(ok.h||0);
-  const aL=clamp(l,0.50,0.62);
-  const aC=clamp(c,0,0.20);
+  const aL=clamp(l,0.42,0.90);
+  const aC=clamp(c,0,0.37);
   return{
     secondary:      toHex(aL,    aC,                   h),
     secondaryLight: toHex(clamp(aL+.17,.67,.83), clamp(aC*.68,0,.15),  h),
@@ -360,133 +362,21 @@ function renderPosterCards(p){
       </div>
     </div>`;
 
-  // Card 3: Split — bgLight top with real text + bgDark bottom with body copy
+  // Card 3: COLOUR. logotype — bgLight surface, browser-chrome bars + primary rule + wordmark
   const card3=`
-    <div style="border-radius:16px;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;font-family:'DM Sans',sans-serif">
-      <div style="flex:0 0 44%;background:${p.bgLight};padding:20px 20px 16px;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${lt};opacity:.3">Colour System</div>
-        <div>
-          <div style="font-size:clamp(15px,1.9vw,19px);font-weight:700;line-height:1.32;letter-spacing:-.4px;color:${lt}">All the roles<br>you need, <span style="color:${p.primary}">built<br>for brands.</span></div>
-        </div>
+    <div style="border-radius:16px;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;background:${p.bgLight};padding:24px 26px;font-family:'DM Sans',sans-serif">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="height:7px;width:48px;background:${p.bgDark};opacity:.28;border-radius:4px"></div>
+        <div style="height:7px;width:26px;background:${p.bgDark};opacity:.14;border-radius:4px"></div>
       </div>
-      <div style="flex:1;background:${p.bgDark};padding:16px 20px 20px;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="flex:1;font-size:9.5px;line-height:1.65;color:${dt};opacity:.42">One anchor colour. A complete system that holds across every touchpoint — hero to footer.</div>
-          <div style="width:50px;height:54px;border-radius:7px;border:1.5px solid ${p.primary};background:${ra(p.primary,.1)};flex-shrink:0"></div>
-        </div>
-        <div style="border:1.5px solid ${dt};padding:7px 13px;border-radius:5px;font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;display:inline-block;color:${dt};opacity:.32">Learn More →</div>
+      <div style="flex:1"></div>
+      <div>
+        <div style="height:3px;width:30px;background:${p.primary};margin-bottom:13px"></div>
+        <div style="font-size:clamp(34px,4.4vw,52px);font-weight:800;letter-spacing:-2px;line-height:.88;color:${p.bgDark}">COLOUR.</div>
       </div>
     </div>`;
 
   el.innerHTML=card1+card2+card3;
-}
-
-function renderBrandGrid(p){
-  const el=document.getElementById('brandGrid');
-  const dt=bestText(p.bgDark);
-  const pt=bestText(p.primary);
-
-  const tWordmark=`
-    <div style="background:${p.bgDark};padding:26px 22px 22px;height:100%;display:flex;flex-direction:column;justify-content:space-between">
-      <div style="font-size:clamp(13px,1.4vw,15.5px);font-weight:500;line-height:1.52;color:${dt}">
-        <span style="font-style:italic;font-weight:600;color:${p.primary}">Colour before everything.</span> Before the layout. Before the copy. Colour is the first thing they feel and the last thing they forget. One anchor colour. Six roles. Every surface, every button, every headline — covered.
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px">
-        <div style="background:${p.light};color:${bestText(p.light)};padding:6px 15px;border-radius:100px;font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">Colour System</div>
-        <div style="font-size:9px;color:${dt};opacity:.36;line-height:1.55;text-align:right">One anchor.<br>Complete system.</div>
-      </div>
-    </div>`;
-
-  const navBtn=p.secondary||p.primary;
-  const tWebsite=`
-    <div>
-      <div style="background:${p.bgDark};padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <span style="font-weight:700;font-size:12px;color:${dt};letter-spacing:-.3px">Brand.</span>
-        <div style="display:flex;gap:14px">${['Work','About','Contact'].map(l=>`<span style="font-size:11px;color:${dt};opacity:.42">${l}</span>`).join('')}</div>
-        <div style="background:${navBtn};padding:5px 12px;border-radius:6px;font-size:10px;font-weight:600;color:${bestText(navBtn)}">Start →</div>
-      </div>
-      <div style="background:${p.bgDark};padding:28px 22px 32px">
-        <div style="display:inline-block;background:${ra(p.primary,.18)};color:${p.primary};padding:4px 10px;border-radius:100px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Visual Identity</div>
-        <div style="font-size:22px;font-weight:700;color:${dt};letter-spacing:-.6px;line-height:1.22;margin-bottom:9px">Design that speaks<br>before you say a word.</div>
-        <div style="font-size:12px;color:${dt};opacity:.45;line-height:1.68;margin-bottom:18px;max-width:320px">Visual systems that give your brand a lasting presence across every single touchpoint.</div>
-        <div style="display:flex;gap:8px">
-          <div style="background:${p.primary};color:${pt};padding:8px 16px;border-radius:7px;font-size:11px;font-weight:600">View Work</div>
-          <div style="border:1.5px solid ${dt};color:${dt};padding:8px 16px;border-radius:7px;font-size:11px;font-weight:600;opacity:.28">Get in Touch</div>
-        </div>
-      </div>
-    </div>`;
-
-  const tIcon=`
-    <div style="background:${p.bgLight};padding:20px 22px;height:100%;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="height:6px;width:42px;background:${p.bgDark};opacity:.28;border-radius:3px"></div>
-        <div style="height:6px;width:22px;background:${p.bgDark};opacity:.14;border-radius:3px"></div>
-      </div>
-      <div>
-        <div style="height:2px;width:28px;background:${p.primary};margin-bottom:10px"></div>
-        <div style="font-size:clamp(46px,5.5vw,62px);font-weight:800;letter-spacing:-2.5px;line-height:.9;color:${p.bgDark}">COLOUR.</div>
-      </div>
-    </div>`;
-
-  const ccards=p.secondary?[
-    {hex:p.bgDark,         role:'BG DARK',   copy:'Hero Section',    sub:'Deep, dark foundations'},
-    {hex:p.bgLight,        role:'BG LIGHT',  copy:'Content Area',    sub:'Clean, open surfaces'},
-    {hex:p.primary,        role:'PRIMARY',   copy:'CTA Button',      sub:'Click. Tap. Convert.'},
-    {hex:p.secondary,      role:'SECONDARY', copy:'Alt. Action',     sub:'Secondary interactions'},
-    {hex:p.light,          role:'LIGHT',     copy:'Highlights',      sub:'Soft accent & hover'},
-    {hex:p.secondaryLight, role:'SEC LIGHT', copy:'Sec. Tint',       sub:'Subtle accent surfaces'},
-    {hex:p.deep,           role:'DEEP',      copy:'Hover State',     sub:'Pressed & active'},
-    {hex:p.secondaryDeep,  role:'SEC DEEP',  copy:'Sec. Hover',      sub:'Secondary pressed'},
-    {hex:p.muted,          role:'MUTED',     copy:'Body Text',       sub:'Captions & metadata'}
-  ]:[
-    {hex:p.bgDark,  role:'BG DARK',  copy:'Hero Section',  sub:'Deep, dark foundations'},
-    {hex:p.bgLight, role:'BG LIGHT', copy:'Content Area',  sub:'Clean, open surfaces'},
-    {hex:p.primary, role:'PRIMARY',  copy:'CTA Button',    sub:'Click. Tap. Convert.'},
-    {hex:p.light,   role:'LIGHT',    copy:'Highlights',    sub:'Soft accent & hover'},
-    {hex:p.deep,    role:'DEEP',     copy:'Hover State',   sub:'Pressed & active'},
-    {hex:p.muted,   role:'MUTED',    copy:'Body Text',     sub:'Captions & metadata'}
-  ];
-  const tccols=p.secondary?3:2;
-  const tColors=`
-    <div style="height:100%;display:grid;grid-template-columns:repeat(${tccols},1fr);grid-template-rows:repeat(3,1fr);overflow:hidden">
-      ${ccards.map(c=>{
-        const tc=bestText(c.hex);
-        return`<div style="background:${c.hex};padding:12px 13px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden">
-          <div style="font-size:6.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:${tc};opacity:.35">${c.role}</div>
-          <div>
-            <div style="font-size:${tccols===3?'10.5px':'13px'};font-weight:700;letter-spacing:-.2px;line-height:1.18;color:${tc};opacity:.9;margin-bottom:3px">${c.copy}</div>
-            <div style="font-size:${tccols===3?'7px':'7.5px'};line-height:1.4;color:${tc};opacity:.46;margin-bottom:5px">${c.sub}</div>
-            <div style="font-size:7px;font-family:'DM Mono',monospace;letter-spacing:.04em;color:${tc};opacity:.28">${c.hex}</div>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-
-  const ltc=bestText(p.light);
-  const c1=p.secondary||p.primary;
-  const c2=p.secondaryDeep||p.deep;
-  const tSocial=`
-    <div style="background:${p.light};height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:22px 20px">
-      <div style="position:absolute;top:-18px;right:-18px;pointer-events:none">
-        <svg width="145" height="145" viewBox="0 0 145 145" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="42" r="52" fill="${ra(c1,.68)}"/>
-          <circle cx="52"  cy="90" r="36" fill="${ra(c2,.56)}"/>
-          <circle cx="118" cy="100" r="28" fill="${ra(c1,.32)}"/>
-        </svg>
-      </div>
-      <div style="font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:${ltc};opacity:.42;position:relative">Brand Story</div>
-      <div style="position:relative">
-        <div style="font-size:clamp(15px,1.8vw,19px);font-weight:700;color:${ltc};line-height:1.25;letter-spacing:-.4px;margin-bottom:9px">Building brand<br>identity with<br>intention.</div>
-        <div style="font-size:10.5px;color:${ltc};opacity:.52;line-height:1.55">Colour systems that hold across every touchpoint.</div>
-      </div>
-    </div>`;
-
-  el.innerHTML=`
-    <div class="bt">${tWordmark}</div>
-    <div class="bt bt-two">${tWebsite}</div>
-    <div class="bt">${tIcon}</div>
-    <div class="bt">${tColors}</div>
-    <div class="bt">${tSocial}</div>`;
 }
 
 // ── Generate & sync ───────────────────────────────────────────────────
@@ -510,7 +400,7 @@ function generate(hex,hex2){
   renderPreview(currentPalette);
   renderLightPreview(currentPalette);
   renderPosterCards(currentPalette);
-  renderBrandGrid(currentPalette);
+  if(!hasSec) renderSchemeRow(hex);
   document.getElementById('swatchFace').style.background=hex;
   document.getElementById('colorPicker').value=hex;
   document.getElementById('hexInput').value=hex.replace('#','');
@@ -705,6 +595,57 @@ function downloadPNG(){
   showToast('PNG downloaded');
 }
 
+// ── Companion suggestions ─────────────────────────────────────────────
+// Applies a suggested hex as the secondary anchor and regenerates.
+function applyCompanion(hex){
+  document.querySelectorAll('#schemeRow .scheme-tile')
+    .forEach(b=>b.classList.remove('active'));
+  hasSec=true;
+  document.getElementById('secRow').style.display='flex';
+  document.getElementById('addSecBtn').style.display='none';
+  currentSecondaryAnchor=hex;
+  generate(currentAnchor,hex);
+}
+
+// ── Designed 4-role scheme (anchor · deep · accent · neutral) ──────────
+// Unlike the harmony chips, each companion sits at its OWN lightness and
+// chroma — mirroring a hand-built palette like the Switch Palette reference.
+function schemeColors(anchorHex){
+  const ok=culori.oklch(anchorHex);
+  if(!ok) return[];
+  const l=isNaN(ok.l)?0.5:(ok.l||0);
+  const c=isNaN(ok.c)?0:(ok.c||0);
+  const h=isNaN(ok.h)?0:(ok.h||0);
+  return[
+    {label:'Anchor', hex:anchorHex.toLowerCase(), anchor:true},
+    // Deep shade — same hue family, dropped dark & calmer (yellow → brown).
+    {label:'Deep',    hex:toHex(clamp(l*0.40,0.20,0.34), clamp(c*0.58,0.02,0.095), h)},
+    // Contrast accent — complement, balanced mid-tone.
+    {label:'Accent',  hex:toHex(clamp(l*0.62,0.44,0.58), clamp(Math.max(c*0.72,0.07),0,0.13), (h+180)%360)},
+    // Light neutral — near-white, faintly tinted by the hue.
+    {label:'Neutral', hex:toHex(clamp(Math.max(l,0.80)+0.07,0.86,0.94), 0.006, h)},
+  ];
+}
+
+function renderSchemeRow(anchorHex){
+  const row=document.getElementById('schemeRow');
+  row.innerHTML=schemeColors(anchorHex).map(({label,hex,anchor})=>`
+    <button class="scheme-tile${anchor?' is-anchor':''}" data-hex="${hex}"${anchor?' disabled':''}>
+      <span class="scheme-swatch" style="background:${hex}"></span>
+      <span class="scheme-meta">
+        <span class="scheme-label">${label}</span>
+        <span class="scheme-hex">${hex.toUpperCase()}</span>
+      </span>
+    </button>`).join('');
+
+  row.querySelectorAll('.scheme-tile:not(.is-anchor)').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      applyCompanion(btn.dataset.hex);
+      btn.classList.add('active');
+    });
+  });
+}
+
 // ── Input sync ────────────────────────────────────────────────────────
 
 const picker=document.getElementById('colorPicker');
@@ -749,6 +690,8 @@ hexInput2.addEventListener('keydown',e=>{if(e.key==='Enter') genBtn.click()});
 addSecBtn.addEventListener('click',()=>{
   hasSec=true;
   document.getElementById('secRow').style.display='flex';
+  document.getElementById('schemeRow').style.display='none';
+  document.getElementById('schemeCaption').style.display='none';
   addSecBtn.style.display='none';
   generate(currentAnchor,currentSecondaryAnchor);
 });
@@ -756,6 +699,9 @@ addSecBtn.addEventListener('click',()=>{
 secRemove.addEventListener('click',()=>{
   hasSec=false;
   document.getElementById('secRow').style.display='none';
+  document.getElementById('schemeRow').style.display='flex';
+  document.getElementById('schemeCaption').style.display='';
+  document.querySelectorAll('#schemeRow .scheme-tile').forEach(b=>b.classList.remove('active'));
   addSecBtn.style.display='';
   generate(currentAnchor);
 });

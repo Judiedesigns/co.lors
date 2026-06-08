@@ -388,21 +388,6 @@ body.light .icon-moon{display:block}
 .poster-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media(max-width:600px){.poster-row{grid-template-columns:1fr;max-width:300px;margin:0 auto}}
 
-/* ── Brand grid ── */
-.brand-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.brand-grid .bt{border-radius:12px;overflow:hidden;border:1px solid var(--border2)}
-.bt-two{grid-column:2/4}
-.bt-full{grid-column:1/4}
-@media(max-width:680px){
-  .brand-grid{grid-template-columns:repeat(2,1fr)}
-  .bt-two{grid-column:1/3}
-  .bt-full{grid-column:1/3}
-}
-@media(max-width:440px){
-  .brand-grid{grid-template-columns:1fr}
-  .bt-two,.bt-full{grid-column:1}
-}
-
 /* ── Export bar ── */
 .export-bar{
   display:flex;
@@ -466,6 +451,87 @@ body.light .export-btn-dl{color:var(--text2)}
   letter-spacing:.04em;
 }
 
+/* ── Scheme row (designed 4-role companions) ── */
+.scheme-caption{
+  margin-top:14px;
+  margin-left:74px;
+  font-size:11px;
+  color:var(--text3);
+  letter-spacing:.01em;
+}
+.scheme-row{
+  display:flex;
+  align-items:stretch;
+  gap:10px;
+  margin-top:8px;
+  margin-left:74px;
+  flex-wrap:wrap;
+}
+.scheme-tile{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  text-align:left;
+}
+.scheme-tile.is-anchor{cursor:default}
+.scheme-swatch{
+  position:relative;
+  display:block;
+  width:64px;
+  height:64px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  transition:transform .15s,box-shadow .15s;
+}
+/* Hover "+" / active "✓" badge — white pill works on any swatch colour */
+.scheme-tile:not(.is-anchor) .scheme-swatch::after{
+  content:'+';
+  position:absolute;
+  top:6px;
+  right:6px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.12);
+  color:#111;
+  font-size:13px;
+  font-weight:600;
+  line-height:16px;
+  text-align:center;
+  opacity:0;
+  transform:scale(.8);
+  transition:opacity .15s,transform .15s;
+}
+.scheme-tile:not(.is-anchor):hover .scheme-swatch{
+  transform:translateY(-2px);
+  box-shadow:0 4px 14px rgba(0,0,0,.28);
+}
+.scheme-tile:not(.is-anchor):hover .scheme-swatch::after{opacity:1;transform:scale(1)}
+.scheme-tile.active .scheme-swatch{
+  box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--text2);
+}
+.scheme-tile.active .scheme-swatch::after{content:'✓';opacity:1;transform:scale(1);font-size:11px}
+.scheme-meta{display:flex;flex-direction:column;gap:1px;padding-left:1px}
+.scheme-label{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+.scheme-hex{
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  color:var(--text2);
+  letter-spacing:.02em;
+}
+.scheme-tile.is-anchor .scheme-label{color:var(--text2)}
+
 /* ── Mobile ── */
 @media(max-width:600px){
   .header{
@@ -476,7 +542,7 @@ body.light .export-btn-dl{color:var(--text2)}
   }
   .color-input-row{flex-wrap:wrap}
   .gen-btn{width:100%;margin-top:4px}
-  .add-sec-btn,.input-note{margin-left:0}
+  .add-sec-btn,.input-note,.scheme-row,.scheme-caption{margin-left:0}
 }
 @media(max-width:480px){
   .pv-split{grid-template-columns:1fr}
