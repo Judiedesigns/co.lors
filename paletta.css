@@ -64,7 +64,7 @@ body.light .icon-moon{display:block}
 .header{
   padding:60px 0 48px;
   display:flex;
-  align-items:flex-end;
+  align-items:flex-start;
   justify-content:space-between;
   gap:24px;
   flex-wrap:wrap;
@@ -223,6 +223,40 @@ body.light .icon-moon{display:block}
 }
 .gen-btn:hover{opacity:.85}
 .gen-btn:active{transform:scale(.97)}
+
+/* ── Control panel card (groups the generator controls) ── */
+.input-section.cp{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px 22px 24px;
+  gap:14px;
+  width:430px;
+  box-shadow:0 4px 24px rgba(0,0,0,.06);
+}
+.cp-head{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+.input-section.cp .hex-field{flex:1}
+.input-section.cp .gen-btn{margin-left:0}
+.input-section.cp .add-sec-btn{margin-left:0}
+/* Separator hangs off the palette caption, so it disappears with it when a
+   secondary colour is added (and the suggested palette is hidden) */
+.input-section.cp .scheme-caption{
+  margin-left:0;
+  margin-top:0;
+  border-top:1px solid var(--border);
+  padding-top:16px;
+}
+.input-section.cp .scheme-row{margin-left:0;margin-top:10px}
+.input-section.cp .scheme-swatch{width:72px;height:56px}
+/* Card heading names the input; both swatches align flush so the rows stack
+   cleanly. The × on the secondary row marks it as the optional one. */
+.input-section.cp .color-input-label{display:none}
 
 /* ── Section label ── */
 .section-label{
@@ -564,6 +598,7 @@ body.light .export-btn-dl{color:var(--text2)}
   .color-input-row{flex-wrap:wrap}
   .gen-btn{width:100%;margin-top:4px}
   .add-sec-btn,.input-note,.scheme-row,.scheme-caption{margin-left:0}
+  .input-section.cp{width:100%}
 }
 @media(max-width:480px){
   .pv-split{grid-template-columns:1fr}
