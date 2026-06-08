@@ -161,9 +161,10 @@ body.light .icon-moon{display:block}
 .swatch-wrap:hover{transform:scale(1.06)}
 .swatch-wrap input[type="color"]{
   position:absolute;
-  inset:-8px;
-  width:calc(100%+16px);
-  height:calc(100%+16px);
+  top:-8px;
+  left:-8px;
+  width:calc(100% + 16px);
+  height:calc(100% + 16px);
   opacity:0;
   cursor:pointer;
   z-index:2;
