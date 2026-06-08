@@ -62,12 +62,14 @@ body.light .icon-moon{display:block}
 
 /* ── Header ── */
 .header{
-  padding:60px 0 48px;
+  padding:60px 0 40px;
+  margin-bottom:8px;
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
   gap:24px;
   flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
 }
 .wordmark{
   font-size:11px;
@@ -224,20 +226,15 @@ body.light .icon-moon{display:block}
 .gen-btn:hover{opacity:.85}
 .gen-btn:active{transform:scale(.97)}
 
-/* ── Control panel card (groups the generator controls) ── */
+/* ── Generator controls — grouped on the page canvas, not a raised card ── */
 .input-section.cp{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:22px 22px 24px;
   gap:14px;
   width:430px;
-  box-shadow:0 4px 24px rgba(0,0,0,.06);
 }
 .cp-head{
-  font-size:11px;
+  font-size:10px;
   font-weight:600;
-  letter-spacing:.12em;
+  letter-spacing:.16em;
   text-transform:uppercase;
   color:var(--text3);
 }
