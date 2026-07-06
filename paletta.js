@@ -712,6 +712,15 @@ function renderSchemeRow(anchorHex){
   });
 }
 
+function copyCompanionPalette(){
+  const palette=schemeColors(currentAnchor).reduce((acc,{label,hex})=>{
+    acc[label.toLowerCase()]=hex.toUpperCase();
+    return acc;
+  },{});
+  writeClipboard(JSON.stringify(palette,null,2));
+  showToast('Companion palette copied');
+}
+
 // ── Input sync ────────────────────────────────────────────────────────
 
 const picker=document.getElementById('colorPicker');
@@ -721,6 +730,7 @@ const hexInput2=document.getElementById('hexInput2');
 const genBtn=document.getElementById('genBtn');
 const addSecBtn=document.getElementById('addSecBtn');
 const secRemove=document.getElementById('secRemove');
+const copyPaletteBtn=document.getElementById('copyPaletteBtn');
 
 picker.addEventListener('input',e=>{
   hexInput.value=e.target.value.replace('#','');
@@ -771,6 +781,8 @@ secRemove.addEventListener('click',()=>{
   addSecBtn.style.display='';
   generate(currentAnchor);
 });
+
+copyPaletteBtn.addEventListener('click',copyCompanionPalette);
 
 // ── Preview tabs ─────────────────────────────────────────────────────
 
