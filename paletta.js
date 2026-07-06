@@ -94,6 +94,13 @@ function generateSecondaryPalette(anchorHex){
   };
 }
 
+function randomAnchor(){
+  const h=Math.floor(Math.random()*360);
+  const l=0.52+Math.random()*0.22;
+  const c=0.09+Math.random()*0.17;
+  return toHex(l,c,h);
+}
+
 // ── State ─────────────────────────────────────────────────────────────
 
 let currentPalette=null;
@@ -101,6 +108,7 @@ let currentAnchor='#c4522a';
 let currentSecondaryAnchor='#2a6dc4';
 let hasSec=false;
 let autoSort=true;  // role list: sort dark → light vs. declaration order
+let contrastPair={text:'bgLight',bg:'bgDark'};
 
 // ── Render role gallery (editorial swatch row) ────────────────────────
 
@@ -145,6 +153,129 @@ function renderCards(palette){
   }
   inner+=`<div class="rl-foot"><button class="rl-toggle${autoSort?' on':''}" id="rlToggle" aria-pressed="${autoSort}" aria-label="Toggle auto-sort"></button> Auto-sort · dark → light</div>`;
   grid.innerHTML=inner;
+}
+
+// ── Contrast lab ─────────────────────────────────────────────────────
+
+function activeRoles(palette){
+  return palette.secondary?[...ROLES,...SECONDARY_ROLES]:ROLES;
+}
+
+function contrastGrade(ratio){
+  if(ratio>=7) return {label:'AAA',tone:'strong'};
+  if(ratio>=4.5) return {label:'AA',tone:'good'};
+  if(ratio>=3) return {label:'Large',tone:'warn'};
+  return {label:'Fail',tone:'fail'};
+}
+
+function pairOptions(roles,palette,selected){
+  return roles.map(role=>`
+    <option value="${role.key}" ${role.key===selected?'selected':''}>
+      ${role.name} ${palette[role.key].toUpperCase()}
+    </option>`).join('');
+}
+
+function readablePairName(roleA,roleB){
+  return `${roleA.name} / ${roleB.name}`;
+}
+
+function allContrastPairs(roles,palette){
+  const pairs=[];
+  roles.forEach(textRole=>{
+    roles.forEach(bgRole=>{
+      if(textRole.key===bgRole.key) return;
+      const text=palette[textRole.key];
+      const bg=palette[bgRole.key];
+      pairs.push({
+        textRole,
+        bgRole,
+        text,
+        bg,
+        ratio:contrast(text,bg)
+      });
+    });
+  });
+  return pairs.sort((a,b)=>b.ratio-a.ratio);
+}
+
+function uniqueContrastPairs(roles,palette){
+  const seen=new Set();
+  return allContrastPairs(roles,palette).filter(pair=>{
+    const key=[pair.textRole.key,pair.bgRole.key].sort().join('|');
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function ensureContrastPair(roles){
+  const keys=roles.map(r=>r.key);
+  if(!keys.includes(contrastPair.text)) contrastPair.text='bgLight';
+  if(!keys.includes(contrastPair.bg)) contrastPair.bg='bgDark';
+  if(contrastPair.text===contrastPair.bg) contrastPair.bg=keys.find(k=>k!==contrastPair.text)||'bgDark';
+}
+
+function renderContrastLab(palette){
+  const lab=document.getElementById('contrastLab');
+  if(!lab) return;
+  const roles=activeRoles(palette);
+  ensureContrastPair(roles);
+
+  const textRole=roles.find(r=>r.key===contrastPair.text);
+  const bgRole=roles.find(r=>r.key===contrastPair.bg);
+  const text=palette[textRole.key];
+  const bg=palette[bgRole.key];
+  const ratio=contrast(text,bg);
+  const grade=contrastGrade(ratio);
+  const sharpPairs=uniqueContrastPairs(roles,palette)
+    .filter(pair=>pair.ratio>=4.5)
+    .slice(0,4);
+
+  lab.innerHTML=`
+    <div class="cl-stage" style="background:${bg};color:${text}">
+      <div class="cl-stage-top">
+        <div>
+          <div class="cl-aa">Aa ${ratio.toFixed(2)}</div>
+          <div class="cl-badge cl-${grade.tone}">${grade.label}</div>
+        </div>
+      </div>
+      <p class="cl-sample">Use this pair for headings, body copy, buttons, and editorial moments that need clear contrast.</p>
+      <div class="cl-values">
+        <div>
+          <span>Text</span>
+          <strong>${text.toUpperCase()}</strong>
+        </div>
+        <div>
+          <span>Background</span>
+          <strong>${bg.toUpperCase()}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="cl-controls">
+      <div class="cl-selects">
+        <label>
+          <span>Text</span>
+          <select id="contrastText">${pairOptions(roles,palette,textRole.key)}</select>
+        </label>
+        <label>
+          <span>Background</span>
+          <select id="contrastBg">${pairOptions(roles,palette,bgRole.key)}</select>
+        </label>
+      </div>
+      <div class="cl-actions">
+        <button type="button" class="cl-btn" id="contrastReverse">Reverse</button>
+        <button type="button" class="cl-btn" id="contrastRandom">Random</button>
+        <button type="button" class="cl-btn" id="contrastCopy">Copy pair</button>
+      </div>
+      <div class="cl-pairs">
+        ${sharpPairs.map(pair=>`
+          <button type="button" class="cl-card" data-text="${pair.textRole.key}" data-bg="${pair.bgRole.key}" style="background:${pair.bg};color:${pair.text}">
+            <span class="cl-card-ratio">${pair.ratio.toFixed(2)}</span>
+            <span class="cl-card-name">${readablePairName(pair.textRole,pair.bgRole)}</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
 }
 
 // Click or Enter/Space on a swatch copies its hex. Optimistic feedback with an
@@ -352,98 +483,12 @@ function renderLightPreview(p){
     </div>`;
 }
 
-// ── Poster cards & brand sheet ────────────────────────────────────────
+// ── Preview helpers ──────────────────────────────────────────────────
 
 function ra(hex,a){const{r,g,b}=hexToRgb(hex);return`rgba(${r},${g},${b},${a})`}
 
 // Tag a coloured block so the hover peek can reveal its role + hex
 function ci(label,hex){return hex?`data-ci="${label}|${hex.toString().toUpperCase()}"`:'';}
-
-function makeArt(p,v){
-  const s=[
-    `<rect width="400" height="260" fill="${p.bgDark}"/>
-     <ellipse cx="252" cy="318" rx="208" ry="190" fill="${ra(p.primary,.80)}"/>
-     <ellipse cx="18"  cy="252" rx="158" ry="142" fill="${ra(p.light,.52)}"/>
-     <circle  cx="326" cy="68"  r="108"           fill="${ra(p.deep,.62)}"/>
-     <circle  cx="70"  cy="312" r="138"           fill="${ra(p.primary,.26)}"/>`,
-    `<rect width="400" height="260" fill="${p.primary}"/>
-     <ellipse cx="252" cy="312" rx="208" ry="188" fill="${ra(p.deep,.65)}"/>
-     <ellipse cx="18"  cy="250" rx="155" ry="140" fill="${ra(p.light,.52)}"/>
-     <circle  cx="322" cy="66"  r="105"           fill="${ra(p.bgLight,.28)}"/>
-     <circle  cx="68"  cy="308" r="136"           fill="${ra(p.bgDark,.26)}"/>`,
-    `<rect width="400" height="260" fill="${p.bgLight}"/>
-     <ellipse cx="252" cy="314" rx="206" ry="188" fill="${ra(p.primary,.38)}"/>
-     <ellipse cx="18"  cy="250" rx="155" ry="140" fill="${ra(p.deep,.30)}"/>
-     <circle  cx="324" cy="66"  r="106"           fill="${ra(p.light,.44)}"/>
-     <circle  cx="68"  cy="310" r="136"           fill="${ra(p.primary,.18)}"/>`
-  ];
-  return`<svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%">${s[v%3]}</svg>`;
-}
-
-function renderPosterCards(p){
-  const el=document.getElementById('posterCards');
-  const dt=bestText(p.bgDark);
-  const pt=bestText(p.primary);
-  const lt=bestText(p.bgLight);
-
-  // Card 1: Santé-style — primary strip + bgDark + real typography + primary badge
-  const card1=`
-    <div style="border-radius:16px;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;background:${p.bgDark};font-family:'DM Sans',sans-serif">
-      <div style="height:7px;background:${p.primary};flex-shrink:0"></div>
-      <div style="flex:1;padding:20px 22px 22px;display:flex;flex-direction:column">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
-          <span style="font-size:13px;font-weight:700;color:${dt};letter-spacing:-.2px">Brand.</span>
-          <span style="font-size:7.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:${dt};opacity:.38">Visual Story</span>
-        </div>
-        <div style="font-size:22px;font-weight:700;color:${dt};opacity:.55;line-height:1;margin-bottom:8px">"</div>
-        <div style="font-size:clamp(14px,1.7vw,17px);font-weight:600;line-height:1.42;color:${dt};letter-spacing:-.3px;flex:1">Design that speaks<br>before you say<br>a word.</div>
-        <div style="height:1px;background:${dt};opacity:.1;margin:16px 0"></div>
-        <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
-          <div style="width:30px;height:30px;border-radius:7px;background:${p.primary};flex-shrink:0;display:flex;align-items:center;justify-content:center">
-            <div style="width:10px;height:13px;background:${pt};opacity:.7;border-radius:2px"></div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:${dt};letter-spacing:-.1px;margin-bottom:2px">Studio Client</div>
-            <div style="font-size:7.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${p.primary};opacity:.75">Paletta System</div>
-          </div>
-        </div>
-        <div style="font-size:9px;color:${dt};opacity:.28;line-height:1.6">Colour systems that hold across every single touchpoint of your brand.</div>
-      </div>
-    </div>`;
-
-  // Card 2: bgLight + circle art + real headline (like tSocial but as a poster)
-  const card2=`
-    <div style="border-radius:16px;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;background:${p.primary};position:relative;padding:22px 22px 24px;font-family:'DM Sans',sans-serif">
-      <div style="position:absolute;top:-24px;right:-24px;pointer-events:none">
-        <svg width="170" height="170" viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="114" cy="56" r="56" fill="${ra(p.deep,.72)}"/>
-          <circle cx="70" cy="98" r="40" fill="${ra(p.bgDark,.40)}"/>
-        </svg>
-      </div>
-      <div style="font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${pt};opacity:.42;position:relative">Brand Story</div>
-      <div style="flex:1"></div>
-      <div style="position:relative">
-        <div style="font-size:clamp(18px,2.2vw,23px);font-weight:700;line-height:1.3;letter-spacing:-.5px;color:${pt};margin-bottom:10px">Building brand<br>identity with<br>intention.</div>
-        <div style="font-size:10.5px;color:${pt};opacity:.52;line-height:1.6">Colour systems that hold across every touchpoint.</div>
-      </div>
-    </div>`;
-
-  // Card 3: COLOUR. logotype — bgLight surface, browser-chrome bars + primary rule + wordmark
-  const card3=`
-    <div style="border-radius:16px;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;background:${p.bgLight};padding:24px 26px;font-family:'DM Sans',sans-serif">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="height:7px;width:48px;background:${p.bgDark};opacity:.28;border-radius:4px"></div>
-        <div style="height:7px;width:26px;background:${p.bgDark};opacity:.14;border-radius:4px"></div>
-      </div>
-      <div style="flex:1"></div>
-      <div>
-        <div style="height:3px;width:30px;background:${p.primary};margin-bottom:13px"></div>
-        <div style="font-size:clamp(34px,4.4vw,52px);font-weight:800;letter-spacing:-2px;line-height:.88;color:${p.bgDark}">COLOUR.</div>
-      </div>
-    </div>`;
-
-  el.innerHTML=card1+card2+card3;
-}
 
 // ── Generate & sync ───────────────────────────────────────────────────
 
@@ -463,9 +508,9 @@ function generate(hex,hex2){
     currentPalette=generatePalette(hex);
   }
   renderCards(currentPalette);
+  renderContrastLab(currentPalette);
   renderPreview(currentPalette);
   renderLightPreview(currentPalette);
-  renderPosterCards(currentPalette);
   if(!hasSec) renderSchemeRow(hex);
   document.getElementById('swatchFace').style.background=hex;
   document.getElementById('colorPicker').value=hex;
@@ -728,6 +773,7 @@ const hexInput=document.getElementById('hexInput');
 const picker2=document.getElementById('colorPicker2');
 const hexInput2=document.getElementById('hexInput2');
 const genBtn=document.getElementById('genBtn');
+const randomAnchorBtn=document.getElementById('randomAnchorBtn');
 const addSecBtn=document.getElementById('addSecBtn');
 const secRemove=document.getElementById('secRemove');
 const copyPaletteBtn=document.getElementById('copyPaletteBtn');
@@ -760,6 +806,11 @@ genBtn.addEventListener('click',()=>{
   if(v1.length===6) generate('#'+v1,v2.length===6?'#'+v2:currentSecondaryAnchor);
 });
 
+randomAnchorBtn.addEventListener('click',()=>{
+  generate(randomAnchor(),currentSecondaryAnchor);
+  showToast('Random colour generated');
+});
+
 hexInput.addEventListener('keydown',e=>{if(e.key==='Enter') genBtn.click()});
 hexInput2.addEventListener('keydown',e=>{if(e.key==='Enter') genBtn.click()});
 
@@ -783,6 +834,61 @@ secRemove.addEventListener('click',()=>{
 });
 
 copyPaletteBtn.addEventListener('click',copyCompanionPalette);
+
+document.addEventListener('change',e=>{
+  if(e.target.id==='contrastText'){
+    contrastPair.text=e.target.value;
+    if(contrastPair.text===contrastPair.bg){
+      const roles=activeRoles(currentPalette);
+      contrastPair.bg=roles.find(r=>r.key!==contrastPair.text)?.key||contrastPair.bg;
+    }
+    renderContrastLab(currentPalette);
+  }
+  if(e.target.id==='contrastBg'){
+    contrastPair.bg=e.target.value;
+    if(contrastPair.text===contrastPair.bg){
+      const roles=activeRoles(currentPalette);
+      contrastPair.text=roles.find(r=>r.key!==contrastPair.bg)?.key||contrastPair.text;
+    }
+    renderContrastLab(currentPalette);
+  }
+});
+
+document.addEventListener('click',e=>{
+  if(!currentPalette) return;
+  const card=e.target.closest&&e.target.closest('.cl-card');
+  if(card){
+    contrastPair={text:card.dataset.text,bg:card.dataset.bg};
+    renderContrastLab(currentPalette);
+    return;
+  }
+  if(e.target.closest&&e.target.closest('#contrastReverse')){
+    contrastPair={text:contrastPair.bg,bg:contrastPair.text};
+    renderContrastLab(currentPalette);
+    return;
+  }
+  if(e.target.closest&&e.target.closest('#contrastRandom')){
+    const roles=activeRoles(currentPalette);
+    const pairs=allContrastPairs(roles,currentPalette).filter(pair=>pair.ratio>=4.5);
+    const pool=pairs.length?pairs:allContrastPairs(roles,currentPalette);
+    const pick=pool[Math.floor(Math.random()*pool.length)];
+    contrastPair={text:pick.textRole.key,bg:pick.bgRole.key};
+    renderContrastLab(currentPalette);
+    return;
+  }
+  if(e.target.closest&&e.target.closest('#contrastCopy')){
+    const roles=activeRoles(currentPalette);
+    const textRole=roles.find(r=>r.key===contrastPair.text);
+    const bgRole=roles.find(r=>r.key===contrastPair.bg);
+    const payload={
+      text:{role:textRole.name,hex:currentPalette[textRole.key].toUpperCase()},
+      background:{role:bgRole.name,hex:currentPalette[bgRole.key].toUpperCase()},
+      contrast:Number(contrast(currentPalette[textRole.key],currentPalette[bgRole.key]).toFixed(2))
+    };
+    writeClipboard(JSON.stringify(payload,null,2));
+    showToast('Contrast pair copied');
+  }
+});
 
 // ── Preview tabs ─────────────────────────────────────────────────────
 
