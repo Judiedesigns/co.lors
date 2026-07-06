@@ -26,6 +26,11 @@ function bestText(bg){
   return contrast(bg,'#ffffff')>=contrast(bg,'#111111')?'#ffffff':'#111111';
 }
 
+function okStr(hex){
+  const o=culori.oklch(hex);
+  return `oklch(${(o.l||0).toFixed(2)} ${(o.c||0).toFixed(3)} ${(o.h||0).toFixed(0)})`;
+}
+
 // ── OKLCH palette generation (via Culori) ─────────────────────────────
 
 function toHex(l,c,h){
@@ -95,44 +100,102 @@ let currentPalette=null;
 let currentAnchor='#c4522a';
 let currentSecondaryAnchor='#2a6dc4';
 let hasSec=false;
+let autoSort=true;  // role list: sort dark → light vs. declaration order
 
-// ── Render role cards ─────────────────────────────────────────────────
+// ── Render role gallery (editorial swatch row) ────────────────────────
 
-function makeCard(hex,role){
-  return`<div class="role-card">
-    <div class="card-swatch" style="background:${hex}"></div>
-    <div class="card-body">
-      <div class="card-role-name">${role.name}</div>
-      <div class="card-hex" data-hex="${hex}" onclick="copyHex(this)">
-        ${hex}
-        <svg class="copy-icon copy-icon-default" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="5.5" y="5.5" width="7" height="7" rx="1.5"/>
-          <path d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"/>
-        </svg>
-        <svg class="copy-icon copy-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 8l3.5 3.5L13 4.5"/>
-        </svg>
-      </div>
-      <div class="card-divider"></div>
-      <div class="card-use">${role.usedFor}</div>
-      <div class="card-never">${role.never}</div>
-    </div>
-  </div>`;
+const CC_SVG=`<svg class="rl-cc-copy" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="7" height="7" rx="1.5"/><path d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"/></svg><svg class="rl-cc-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3.5 3.5L13 4.5"/></svg>`;
+
+// One role row: colour swatch on the left, name → dashed leader line → hex pill
+// on the right. Clicking the row expands a detail strip (usage + live oklch);
+// clicking the hex pill copies the value without toggling the row.
+function roleRow(role,hex){
+  const HEX=hex.toUpperCase();
+  return`<button class="rl-row" data-hex="${hex}">
+    <span class="rl-sw" style="background:${hex}"></span>
+    <span class="rl-content">
+      <span class="rl-line1">
+        <span class="rl-name">${role.name}</span>
+        <span class="rl-lead"></span>
+        <span class="rl-copy" data-hex="${hex}" role="button" tabindex="0" aria-label="Copy ${HEX}">
+          <span class="rl-hexval">${HEX}</span>
+          <span class="rl-cc">${CC_SVG}</span>
+        </span>
+      </span>
+      <span class="rl-meta">
+        <span class="rl-use">${role.usedFor}</span>
+        <span class="rl-ok">${okStr(hex)}</span>
+      </span>
+    </span>
+  </button>`;
+}
+
+// Order rows dark → light by perceptual luminance unless auto-sort is off.
+function roleList(roles,palette){
+  const items=roles.map(r=>({role:r,hex:palette[r.key]}));
+  const ordered=autoSort?[...items].sort((a,b)=>luminance(a.hex)-luminance(b.hex)):items;
+  return`<div class="rl">${ordered.map(i=>roleRow(i.role,i.hex)).join('')}</div>`;
 }
 
 function renderCards(palette){
   const grid=document.getElementById('paletteGrid');
-  const primary=ROLES.map(r=>makeCard(palette[r.key],r)).join('');
-  if(!palette.secondary){
-    grid.innerHTML=primary;
+  let inner=roleList(ROLES,palette);
+  if(palette.secondary){
+    inner+=`<div class="rg-sublabel">Secondary</div>${roleList(SECONDARY_ROLES,palette)}`;
+  }
+  inner+=`<div class="rl-foot"><button class="rl-toggle${autoSort?' on':''}" id="rlToggle" aria-pressed="${autoSort}" aria-label="Toggle auto-sort"></button> Auto-sort · dark → light</div>`;
+  grid.innerHTML=inner;
+}
+
+// Click or Enter/Space on a swatch copies its hex. Optimistic feedback with an
+// execCommand fallback so it never hangs on a clipboard-permission rejection.
+function writeClipboard(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.cssText='position:fixed;top:-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+}
+function copyPill(el){
+  const hex=el.dataset.hex;
+  writeClipboard(hex);
+  el.classList.add('copied');
+  showToast('Copied '+hex.toUpperCase());
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('copied'),1500);
+}
+function toggleRow(row){
+  const wasOpen=row.classList.contains('open');
+  row.parentElement.querySelectorAll('.rl-row').forEach(x=>x.classList.remove('open'));
+  if(!wasOpen) row.classList.add('open');
+}
+document.addEventListener('click',e=>{
+  // Auto-sort toggle: re-render with the new sort preference.
+  if(e.target.closest&&e.target.closest('#rlToggle')){
+    autoSort=!autoSort;
+    if(currentPalette) renderCards(currentPalette);
     return;
   }
-  const sep=`<div style="grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:6px 0 2px">
-    <div style="font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text3)">Secondary Palette</div>
-    <div style="flex:1;height:1px;background:var(--border)"></div>
-  </div>`;
-  grid.innerHTML=primary+sep+SECONDARY_ROLES.map(r=>makeCard(palette[r.key],r)).join('');
-}
+  // Hex pill copies and does NOT toggle the row.
+  const copy=e.target.closest&&e.target.closest('.rl-copy');
+  if(copy){e.stopPropagation();copyPill(copy);return;}
+  // Anywhere else on the row expands / collapses the detail.
+  const row=e.target.closest&&e.target.closest('.rl-row');
+  if(row) toggleRow(row);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const copy=e.target.closest&&e.target.closest('.rl-copy');
+  if(copy){e.preventDefault();copyPill(copy);return;}
+  const row=e.target.closest&&e.target.closest('.rl-row');
+  if(row&&e.target===row){e.preventDefault();toggleRow(row);}
+});
 
 // ── Render wireframe preview ──────────────────────────────────────────
 

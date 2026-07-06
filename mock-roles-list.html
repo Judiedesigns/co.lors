@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Role gallery — okpalette leader-line list</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="paletta.css">
+<script src="https://cdn.jsdelivr.net/npm/culori@3/bundled/culori.min.js"></script>
+<style>
+body{padding:40px}
+.wrap2{max-width:840px;margin:0 auto}
+.section-label{margin-bottom:18px}
+
+/* ── leader-line role list ── */
+.rl{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+.rl-row{display:grid;grid-template-columns:128px 1fr;align-items:stretch;width:100%;background:none;border:none;padding:0;cursor:pointer;text-align:left;font-family:inherit;border-top:1px solid var(--border)}
+.rl-row:first-child{border-top:none}
+.rl-sw{min-height:76px}
+.rl-content{display:flex;flex-direction:column;justify-content:center;padding:0 22px;min-width:0}
+.rl-line1{display:flex;align-items:center;gap:18px;min-height:76px}
+.rl-name{font-family:'DM Mono',monospace;font-size:15px;color:var(--text);white-space:nowrap;letter-spacing:.01em}
+.rl-lead{flex:1;height:0;border-bottom:1px dashed var(--border2);min-width:24px}
+.rl-copy{display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:5px 8px;margin:-5px -8px;border-radius:7px;white-space:nowrap}
+.rl-copy:hover{background:var(--surface)}
+.rl-hexval{font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);letter-spacing:.04em}
+.rl-cc{display:inline-flex;align-items:center}
+.rl-cc svg{width:13px;height:13px}
+.rl-cc-copy{opacity:0;transition:opacity .15s;color:var(--text3)}
+.rl-row:hover .rl-cc-copy{opacity:.55}
+.rl-copy:hover .rl-cc-copy{opacity:1}
+.rl-cc-tick{display:none;color:#4f9d6b}
+.rl-copy.copied .rl-cc-copy{display:none}
+.rl-copy.copied .rl-cc-tick{display:inline-flex}
+.rl-copy.copied .rl-hexval{color:var(--text)}
+.rl-row:hover .rl-name{color:var(--text)}
+.rl-row:hover{background:var(--bg)}
+
+/* expanded selected row */
+.rl-row.open{border-top:1.5px solid var(--text);border-bottom:1.5px solid var(--text)}
+.rl-row.open+.rl-row{border-top:none}
+.rl-row.open .rl-line1{min-height:0;padding-top:18px}
+.rl-meta{display:none;padding:8px 0 18px}
+.rl-row.open .rl-meta{display:block}
+.rl-use{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text2);line-height:1.5}
+.rl-ok{display:block;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-top:6px}
+
+/* footer toggle, echoing okpalette */
+.rl-foot{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
+.rl-toggle{width:34px;height:18px;border-radius:9px;background:var(--text);position:relative}
+.rl-toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface)}
+</style>
+</head>
+<body class="light">
+<div class="wrap2">
+  <div class="section-label">Colour Roles</div>
+  <div class="rl" id="rl"></div>
+  <div class="rl-foot"><span class="rl-toggle"></span> Auto-sort · dark → light</div>
+</div>
+
+<script>
+const CC_SVG=`<svg class="rl-cc-copy" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="7" height="7" rx="1.5"/><path d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"/></svg><svg class="rl-cc-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3.5 3.5L13 4.5"/></svg>`;
+const ROLES=[
+  {hex:'#0a0000', name:'Background Dark', use:'Hero, nav, footer, dark statement sections'},
+  {hex:'#911500', name:'Deep Accent',     use:'Pressed / hover states on buttons, overlay gradients'},
+  {hex:'#574039', name:'Muted Text',      use:'Body copy, captions, secondary labels, metadata'},
+  {hex:'#c4522a', name:'Primary Accent',  use:'CTA buttons, eyebrow labels, active borders'},
+  {hex:'#e8967c', name:'Light Accent',    use:'Italic headline highlights, subtle hover effects'},
+  {hex:'#fff2ee', name:'Background Light', use:'Content sections, card surfaces, page background'},
+];
+function lum(hex){const {r,g,b}=culori.rgb(hex);const f=v=>v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b);}
+function okStr(hex){const o=culori.oklch(hex);return `oklch(${o.l.toFixed(2)} ${o.c.toFixed(3)} ${(o.h||0).toFixed(0)})`;}
+const sorted=[...ROLES].sort((a,b)=>lum(a.hex)-lum(b.hex));
+
+document.getElementById('rl').innerHTML=sorted.map((r,i)=>`
+  <button class="rl-row${i===3?' open':''}" data-hex="${r.hex}">
+    <span class="rl-sw" style="background:${r.hex}"></span>
+    <span class="rl-content">
+      <span class="rl-line1">
+        <span class="rl-name">${r.name}</span>
+        <span class="rl-lead"></span>
+        <span class="rl-copy" data-hex="${r.hex}" role="button" tabindex="0" aria-label="Copy ${r.hex.toUpperCase()}">
+          <span class="rl-hexval">${r.hex.toUpperCase()}</span>
+          <span class="rl-cc">${CC_SVG}</span>
+        </span>
+      </span>
+      <span class="rl-meta">
+        <span class="rl-use">${r.use}</span>
+        <span class="rl-ok">${okStr(r.hex)}</span>
+      </span>
+    </span>
+  </button>`).join('');
+
+// Toast
+let toastT;
+function toast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1400);
+}
+function writeClipboard(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
+  return Promise.resolve(fallbackCopy(text));
+}
+function fallbackCopy(text){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);}
+function copyHex(el){
+  const hex=el.dataset.hex;
+  writeClipboard(hex);
+  el.classList.add('copied');
+  toast('Copied '+hex.toUpperCase());
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('copied'),1400);
+}
+
+const rl=document.getElementById('rl');
+rl.addEventListener('click',e=>{
+  // Hex pill copies and does NOT toggle the row.
+  const copy=e.target.closest('.rl-copy');
+  if(copy){e.stopPropagation();copyHex(copy);return;}
+  // Anywhere else on the row expands / collapses the detail.
+  const row=e.target.closest('.rl-row');if(!row)return;
+  const wasOpen=row.classList.contains('open');
+  document.querySelectorAll('.rl-row').forEach(x=>x.classList.remove('open'));
+  if(!wasOpen) row.classList.add('open');
+});
+rl.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const copy=e.target.closest('.rl-copy');
+  if(copy){e.preventDefault();copyHex(copy);}
+});
+</script>
+</body>
+</html>

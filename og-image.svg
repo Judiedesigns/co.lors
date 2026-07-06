@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0f0f11"/>
+
+  <!-- Subtle grid -->
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.06"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Colour swatches — large circles, right side -->
+  <circle cx="820" cy="160" r="72" fill="#c4522a" opacity="0.95"/>
+  <circle cx="940" cy="230" r="72" fill="#e8a44a" opacity="0.95"/>
+  <circle cx="1010" cy="360" r="72" fill="#4a9e6e" opacity="0.95"/>
+  <circle cx="930" cy="480" r="72" fill="#4a6dc4" opacity="0.95"/>
+  <circle cx="790" cy="510" r="72" fill="#9b59b6" opacity="0.95"/>
+  <circle cx="700" cy="400" r="72" fill="#c44a7a" opacity="0.95"/>
+
+  <!-- Connecting lines between swatches -->
+  <polyline points="820,160 940,230 1010,360 930,480 790,510 700,400 820,160" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.12" stroke-linejoin="round"/>
+
+  <!-- Left content area -->
+  <!-- Wordmark -->
+  <text x="80" y="190" font-size="22" font-weight="500" letter-spacing="6" fill="#ffffff" opacity="0.4" text-anchor="start" font-family="'DM Sans', sans-serif">PALETTA</text>
+
+  <!-- Headline -->
+  <text x="80" y="290" font-size="80" font-weight="300" fill="#ffffff" opacity="0.95" text-anchor="start" font-family="'DM Sans', sans-serif">Colour</text>
+  <text x="80" y="380" font-size="80" font-weight="600" fill="#ffffff" opacity="0.95" text-anchor="start" font-family="'DM Sans', sans-serif">System</text>
+  <text x="80" y="460" font-size="80" font-weight="300" fill="#ffffff" opacity="0.6" text-anchor="start" font-family="'DM Sans', sans-serif">Generator</text>
+
+  <!-- Tagline -->
+  <text x="80" y="530" font-size="22" font-weight="400" fill="#ffffff" opacity="0.45" text-anchor="start" font-family="'DM Sans', sans-serif">One anchor colour. A complete six-role UI system.</text>
+
+  <!-- Bottom accent line -->
+  <rect x="80" y="570" width="120" height="3" rx="2" fill="#c4522a" opacity="0.8"/>
+</svg>
