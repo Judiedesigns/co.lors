@@ -245,19 +245,29 @@ body.light .icon-moon{display:block}
 .input-section.cp .hex-field{flex:1}
 .input-section.cp .gen-btn{margin-left:0}
 .input-section.cp .add-sec-btn{margin-left:0}
-/* Separator hangs off the palette caption, so it disappears with it when a
-   secondary colour is added (and the suggested palette is hidden) */
-.input-section.cp .scheme-caption{
-  margin-left:0;
-  margin-top:0;
-  border-top:1px solid var(--border);
-  padding-top:16px;
-}
-.input-section.cp .scheme-row{margin-left:0;margin-top:10px}
-.input-section.cp .scheme-swatch{width:72px;height:56px}
 /* Card heading names the input; both swatches align flush so the rows stack
    cleanly. The × on the secondary row marks it as the optional one. */
 .input-section.cp .color-input-label{display:none}
+
+/* ── Matching palette output ── */
+.project-palette{
+  padding:0;
+  margin-top:4px;
+}
+.project-palette-rule{
+  height:1px;
+  background:var(--border);
+  margin-bottom:24px;
+}
+.project-palette h2{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.16em;
+  line-height:1;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:14px;
+}
 
 /* ── Section label ── */
 .section-label{
@@ -496,83 +506,90 @@ body.light .export-btn-dl{color:var(--text2)}
 }
 
 /* ── Scheme row (designed 4-role companions) ── */
-.scheme-caption{
-  margin-top:14px;
-  margin-left:74px;
-  font-size:11px;
-  color:var(--text3);
-  letter-spacing:.01em;
-}
 .scheme-row{
-  display:flex;
-  align-items:stretch;
-  gap:10px;
-  margin-top:8px;
-  margin-left:74px;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  margin:0;
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--surface);
 }
 .scheme-tile{
   display:flex;
   flex-direction:column;
-  gap:7px;
   background:transparent;
   border:none;
+  border-left:1px solid var(--border);
   padding:0;
   cursor:pointer;
   text-align:left;
+  min-width:0;
+  transition:background .15s;
 }
+.scheme-tile:first-child{border-left:none}
 .scheme-tile.is-anchor{cursor:default}
+.scheme-tile:not(.is-anchor):hover{background:var(--surface2)}
 .scheme-swatch{
   position:relative;
   display:block;
-  width:64px;
-  height:64px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  transition:transform .15s,box-shadow .15s;
+  width:100%;
+  height:68px;
+  border-radius:0;
+  border:none;
+  border-top:1px solid var(--border);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  transition:transform .15s,box-shadow .15s,border-color .15s;
 }
 /* Hover "+" / active "✓" badge — white pill works on any swatch colour */
 .scheme-tile:not(.is-anchor) .scheme-swatch::after{
-  content:'+';
+  content:'Set secondary';
   position:absolute;
-  top:6px;
-  right:6px;
-  width:18px;
-  height:18px;
-  border-radius:50%;
+  right:10px;
+  bottom:10px;
+  padding:5px 8px;
+  border-radius:999px;
   background:#fff;
   border:1px solid rgba(0,0,0,.12);
   color:#111;
-  font-size:13px;
+  font-size:10px;
   font-weight:600;
-  line-height:16px;
+  line-height:1;
   text-align:center;
   opacity:0;
-  transform:scale(.8);
+  transform:translateY(4px);
   transition:opacity .15s,transform .15s;
 }
 .scheme-tile:not(.is-anchor):hover .scheme-swatch{
-  transform:translateY(-2px);
-  box-shadow:0 4px 14px rgba(0,0,0,.28);
+  border-color:var(--border2);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
 }
-.scheme-tile:not(.is-anchor):hover .scheme-swatch::after{opacity:1;transform:scale(1)}
+.scheme-tile:not(.is-anchor):hover .scheme-swatch::after{opacity:1;transform:translateY(0)}
 .scheme-tile.active .scheme-swatch{
-  box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--text2);
+  box-shadow:inset 0 0 0 2px var(--text2);
 }
-.scheme-tile.active .scheme-swatch::after{content:'✓';opacity:1;transform:scale(1);font-size:11px}
-.scheme-meta{display:flex;flex-direction:column;gap:1px;padding-left:1px}
+.scheme-tile.active .scheme-swatch::after{content:'Selected';opacity:1;transform:translateY(0)}
+.scheme-meta{
+  order:-1;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+  padding:14px 16px 13px;
+}
 .scheme-label{
-  font-size:9px;
+  font-size:10px;
   font-weight:700;
-  letter-spacing:.12em;
+  letter-spacing:.16em;
   text-transform:uppercase;
   color:var(--text3);
 }
 .scheme-hex{
   font-family:'DM Mono',monospace;
-  font-size:10px;
+  font-size:14px;
   color:var(--text2);
-  letter-spacing:.02em;
+  letter-spacing:.01em;
 }
 .scheme-tile.is-anchor .scheme-label{color:var(--text2)}
 
@@ -586,12 +603,24 @@ body.light .export-btn-dl{color:var(--text2)}
   }
   .color-input-row{flex-wrap:wrap}
   .gen-btn{width:100%;margin-top:4px}
-  .add-sec-btn,.input-note,.scheme-row,.scheme-caption{margin-left:0}
+  .add-sec-btn,.input-note{margin-left:0}
   .input-section.cp{width:100%}
+  .project-palette-rule{margin-bottom:18px}
+  .project-palette h2{font-size:10px;margin-bottom:14px}
+  .scheme-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .scheme-tile:nth-child(odd){border-left:none}
+  .scheme-tile:nth-child(n+3){border-top:1px solid var(--border)}
+  .scheme-swatch{height:62px}
+  .scheme-meta{padding:12px 13px 11px}
 }
 @media(max-width:480px){
   .pv-split{grid-template-columns:1fr}
   .pv-split-img{display:none}
   .pv-cards{grid-template-columns:repeat(2,1fr)}
   .export-bar{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:360px){
+  .scheme-row{grid-template-columns:1fr}
+  .scheme-tile{border-left:none}
+  .scheme-tile:nth-child(n+2){border-top:1px solid var(--border)}
 }
