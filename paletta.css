@@ -275,6 +275,28 @@ body.light .icon-moon{display:block}
    cleanly. The × on the secondary row marks it as the optional one. */
 .input-section.cp .color-input-label{display:none}
 
+body.light .input-section.cp{
+  background:#ffffff;
+  border-color:#d9dbe5;
+  box-shadow:0 18px 50px rgba(38,41,52,.08);
+}
+body.light .input-section.cp .hex-field{
+  background:#f7f7fa;
+  border-color:#d4d6df;
+}
+body.light .input-section.cp .gen-btn{
+  background:#111114;
+  color:#ffffff;
+}
+body.light .add-sec-btn,
+body.light .random-anchor-btn{
+  color:#6e7180;
+}
+body.light .add-sec-btn:hover,
+body.light .random-anchor-btn:hover{
+  color:#111114;
+}
+
 /* ── Matching palette output ── */
 .project-palette{
   padding:0;
@@ -318,6 +340,16 @@ body.light .icon-moon{display:block}
   background:var(--surface2);
   border-color:var(--border2);
   color:var(--text);
+}
+body.light .copy-palette-btn{
+  background:#ffffff;
+  border-color:#d9dbe5;
+  color:#52525f;
+}
+body.light .copy-palette-btn:hover{
+  background:#ededf2;
+  border-color:#c8cad6;
+  color:#111114;
 }
 
 /* ── Section label ── */
@@ -815,6 +847,33 @@ body.light .export-btn-dl{color:var(--text2)}
   letter-spacing:.01em;
 }
 .scheme-tile.is-anchor .scheme-label{color:var(--text2)}
+
+body.light .scheme-row{
+  background:#ffffff;
+  border-color:#d9dbe5;
+}
+body.light .scheme-tile{
+  border-left-color:#d9dbe5;
+}
+body.light .scheme-tile:nth-child(n){
+  color:#111114;
+}
+body.light .scheme-tile:not(.is-anchor):hover{
+  background:#f0f1f6;
+}
+body.light .scheme-swatch{
+  border-top-color:#d9dbe5;
+  box-shadow:none;
+}
+body.light .scheme-label{
+  color:#6f7280;
+}
+body.light .scheme-hex{
+  color:#333540;
+}
+body.light .scheme-tile.is-anchor .scheme-label{
+  color:#52525f;
+}
 
 /* ── Mobile ── */
 @media(max-width:900px){
