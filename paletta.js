@@ -511,7 +511,7 @@ function generate(hex,hex2){
   renderContrastLab(currentPalette);
   renderPreview(currentPalette);
   renderLightPreview(currentPalette);
-  if(!hasSec) renderSchemeRow(hex);
+  renderSchemeRow(hex);
   document.getElementById('swatchFace').style.background=hex;
   document.getElementById('colorPicker').value=hex;
   document.getElementById('hexInput').value=hex.replace('#','');
@@ -741,16 +741,24 @@ function schemeColors(anchorHex){
 function renderSchemeRow(anchorHex){
   const row=document.getElementById('schemeRow');
   row.innerHTML=schemeColors(anchorHex).map(({label,hex,anchor})=>`
-    <button class="scheme-tile${anchor?' is-anchor':''}" data-hex="${hex}"${anchor?' disabled':''}>
+    <button class="scheme-tile${anchor?' is-anchor':''}${hasSec&&hex.toLowerCase()===currentSecondaryAnchor.toLowerCase()&&!anchor?' active':''}" data-hex="${hex}"${anchor?' disabled':''}>
       <span class="scheme-swatch" style="background:${hex}"></span>
       <span class="scheme-meta">
         <span class="scheme-label">${label}</span>
-        <span class="scheme-hex">${hex.toUpperCase()}</span>
+        <span class="scheme-hex" title="Copy ${hex.toUpperCase()}">
+          <span>${hex.toUpperCase()}</span>
+          ${anchor?'':'<span class="scheme-copy" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="7" height="7" rx="1.5"/><path d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"/></svg></span>'}
+        </span>
       </span>
     </button>`).join('');
 
   row.querySelectorAll('.scheme-tile:not(.is-anchor)').forEach(btn=>{
-    btn.addEventListener('click',()=>{
+    btn.addEventListener('click',e=>{
+      if(e.target.closest('.scheme-hex')){
+        writeClipboard(btn.dataset.hex.toUpperCase());
+        showToast('Copied '+btn.dataset.hex.toUpperCase());
+        return;
+      }
       applyCompanion(btn.dataset.hex);
       btn.classList.add('active');
     });
@@ -772,55 +780,87 @@ const picker=document.getElementById('colorPicker');
 const hexInput=document.getElementById('hexInput');
 const picker2=document.getElementById('colorPicker2');
 const hexInput2=document.getElementById('hexInput2');
-const genBtn=document.getElementById('genBtn');
 const randomAnchorBtn=document.getElementById('randomAnchorBtn');
 const addSecBtn=document.getElementById('addSecBtn');
 const secRemove=document.getElementById('secRemove');
 const copyPaletteBtn=document.getElementById('copyPaletteBtn');
+const hexStatus=document.getElementById('hexStatus');
+
+function setHexStatus(input,msg=''){
+  const field=input.closest('.hex-field');
+  const invalid=Boolean(msg);
+  field?.classList.toggle('invalid',invalid);
+  input.setAttribute('aria-invalid',invalid?'true':'false');
+  if(hexStatus){
+    hexStatus.textContent=msg;
+    hexStatus.classList.toggle('show',invalid);
+  }
+}
+
+function cleanHexValue(value){
+  return value.replace(/[^0-9a-fA-F]/g,'').slice(0,6);
+}
 
 picker.addEventListener('input',e=>{
   hexInput.value=e.target.value.replace('#','');
+  setHexStatus(hexInput);
   generate(e.target.value,currentSecondaryAnchor);
 });
 
 hexInput.addEventListener('input',e=>{
-  const v=e.target.value.replace(/[^0-9a-fA-F]/g,'').slice(0,6);
+  const v=cleanHexValue(e.target.value);
   e.target.value=v;
-  if(v.length===6) generate('#'+v,currentSecondaryAnchor);
+  if(v.length===0){setHexStatus(hexInput);return;}
+  if(v.length<6){setHexStatus(hexInput,'Enter 6 hex characters');return;}
+  setHexStatus(hexInput);
+  generate('#'+v,currentSecondaryAnchor);
 });
 
 picker2.addEventListener('input',e=>{
   hexInput2.value=e.target.value.replace('#','');
+  setHexStatus(hexInput2);
   generate(currentAnchor,e.target.value);
 });
 
 hexInput2.addEventListener('input',e=>{
-  const v=e.target.value.replace(/[^0-9a-fA-F]/g,'').slice(0,6);
+  const v=cleanHexValue(e.target.value);
   e.target.value=v;
-  if(v.length===6) generate(currentAnchor,'#'+v);
+  if(v.length===0){setHexStatus(hexInput2);return;}
+  if(v.length<6){setHexStatus(hexInput2,'Enter 6 hex characters');return;}
+  setHexStatus(hexInput2);
+  generate(currentAnchor,'#'+v);
 });
 
-genBtn.addEventListener('click',()=>{
+function generateFromInputs(){
   const v1=hexInput.value.trim();
   const v2=hexInput2.value.trim();
-  if(v1.length===6) generate('#'+v1,v2.length===6?'#'+v2:currentSecondaryAnchor);
-});
+  if(v1.length!==6){setHexStatus(hexInput,'Enter 6 hex characters');return;}
+  if(hasSec&&v2.length>0&&v2.length!==6){setHexStatus(hexInput2,'Enter 6 hex characters');return;}
+  setHexStatus(hexInput);
+  setHexStatus(hexInput2);
+  generate('#'+v1,v2.length===6?'#'+v2:currentSecondaryAnchor);
+}
 
 randomAnchorBtn.addEventListener('click',()=>{
+  setHexStatus(hexInput);
+  setHexStatus(hexInput2);
   generate(randomAnchor(),currentSecondaryAnchor);
   showToast('Random colour generated');
 });
 
-hexInput.addEventListener('keydown',e=>{if(e.key==='Enter') genBtn.click()});
-hexInput2.addEventListener('keydown',e=>{if(e.key==='Enter') genBtn.click()});
+hexInput.addEventListener('keydown',e=>{if(e.key==='Enter') generateFromInputs()});
+hexInput2.addEventListener('keydown',e=>{if(e.key==='Enter') generateFromInputs()});
 
 addSecBtn.addEventListener('click',()=>{
   hasSec=true;
+  const suggested=schemeColors(currentAnchor).find(c=>c.label==='Accent')?.hex||currentSecondaryAnchor;
+  currentSecondaryAnchor=suggested;
   document.getElementById('secRow').style.display='flex';
-  document.getElementById('schemeRow').style.display='none';
-  document.getElementById('schemeCaption').style.display='none';
+  document.getElementById('schemeRow').style.display='';
+  document.getElementById('schemeCaption').style.display='';
   addSecBtn.style.display='none';
-  generate(currentAnchor,currentSecondaryAnchor);
+  setHexStatus(hexInput2);
+  generate(currentAnchor,suggested);
 });
 
 secRemove.addEventListener('click',()=>{
@@ -828,7 +868,6 @@ secRemove.addEventListener('click',()=>{
   document.getElementById('secRow').style.display='none';
   document.getElementById('schemeRow').style.display='';
   document.getElementById('schemeCaption').style.display='';
-  document.querySelectorAll('#schemeRow .scheme-tile').forEach(b=>b.classList.remove('active'));
   addSecBtn.style.display='';
   generate(currentAnchor);
 });

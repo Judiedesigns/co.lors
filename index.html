@@ -45,9 +45,10 @@
         </div>
         <div class="hex-field">
           <span class="hash">#</span>
-          <input type="text" id="hexInput" value="c4522a" placeholder="c4522a" maxlength="6" spellcheck="false" autocomplete="off">
+          <input type="text" id="hexInput" value="c4522a" placeholder="c4522a" maxlength="7" spellcheck="false" autocomplete="off">
         </div>
-        <button class="gen-btn" id="genBtn">Generate System</button>
+        <span class="hex-status" id="hexStatus" aria-live="polite"></span>
+        <button class="gen-btn legacy-gen-btn" id="genBtn" aria-hidden="true" tabindex="-1" style="display:none">Generate System</button>
       </div>
       <div class="color-input-row" id="secRow" style="display:none">
         <span class="color-input-label">Secondary</span>
@@ -57,7 +58,7 @@
         </div>
         <div class="hex-field">
           <span class="hash">#</span>
-          <input type="text" id="hexInput2" value="2a6dc4" placeholder="2a6dc4" maxlength="6" spellcheck="false" autocomplete="off">
+          <input type="text" id="hexInput2" value="2a6dc4" placeholder="2a6dc4" maxlength="7" spellcheck="false" autocomplete="off">
         </div>
         <button class="sec-remove" id="secRemove" title="Remove secondary colour">×</button>
       </div>
@@ -72,7 +73,10 @@
   <div class="project-palette" id="schemeCaption">
     <div class="project-palette-rule"></div>
     <div class="project-palette-head">
-      <h2>Companion Palette</h2>
+      <div>
+        <h2>Companion Palette</h2>
+        <p class="project-palette-note">Choose a secondary or copy colours for extra brand accents.</p>
+      </div>
       <button class="copy-palette-btn" id="copyPaletteBtn">Copy palette</button>
     </div>
     <div class="scheme-row" id="schemeRow"></div>
@@ -127,6 +131,6 @@
 <div class="page-footer">Pick any colour — Paletta derives the system.</div>
 <div class="toast" id="toast"></div>
 
-<script src="paletta.js"></script>
+<script src="paletta.js?v=20260707-hex-validation"></script>
 </body>
 </html>

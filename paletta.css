@@ -195,6 +195,10 @@ body.light .icon-moon{display:block}
   transition:border-color .2s;
 }
 .hex-field:focus-within{border-color:var(--border2)}
+.hex-field.invalid{
+  border-color:#8d5c42;
+  box-shadow:0 0 0 1px rgba(141,92,66,.18);
+}
 .hash{
   font-family:'DM Mono',monospace;
   font-size:16px;
@@ -213,24 +217,24 @@ body.light .icon-moon{display:block}
   letter-spacing:.04em;
 }
 .hex-field input::placeholder{color:var(--text3)}
-
-.gen-btn{
-  height:50px;
-  padding:0 22px;
-  background:var(--text);
-  color:var(--bg);
-  border:none;
-  border-radius:10px;
-  font-family:'DM Sans',sans-serif;
-  font-size:13px;
-  font-weight:700;
-  letter-spacing:.02em;
-  cursor:pointer;
-  transition:opacity .15s,transform .1s;
+.legacy-gen-btn{display:none}
+.hex-status{
+  display:none;
+  align-items:center;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  background:rgba(193,138,104,.12);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.04em;
+  color:#c18a68;
   white-space:nowrap;
 }
-.gen-btn:hover{opacity:.85}
-.gen-btn:active{transform:scale(.97)}
+.hex-status.show{
+  display:inline-flex;
+}
+
 .random-anchor-btn{
   background:none;
   color:var(--text2);
@@ -269,7 +273,6 @@ body.light .icon-moon{display:block}
   color:var(--text3);
 }
 .input-section.cp .hex-field{flex:1}
-.input-section.cp .gen-btn{margin-left:0}
 .input-section.cp .add-sec-btn{margin-left:0}
 /* Card heading names the input; both swatches align flush so the rows stack
    cleanly. The × on the secondary row marks it as the optional one. */
@@ -284,9 +287,9 @@ body.light .input-section.cp .hex-field{
   background:#f7f7fa;
   border-color:#d4d6df;
 }
-body.light .input-section.cp .gen-btn{
-  background:#111114;
-  color:#ffffff;
+body.light .input-section.cp .hex-field.invalid{
+  border-color:#b36b45;
+  box-shadow:0 0 0 1px rgba(179,107,69,.16);
 }
 body.light .add-sec-btn,
 body.light .random-anchor-btn{
@@ -295,6 +298,10 @@ body.light .random-anchor-btn{
 body.light .add-sec-btn:hover,
 body.light .random-anchor-btn:hover{
   color:#111114;
+}
+body.light .hex-status{
+  color:#9a552f;
+  background:rgba(154,85,47,.1);
 }
 
 /* ── Matching palette output ── */
@@ -320,6 +327,13 @@ body.light .random-anchor-btn:hover{
   letter-spacing:.16em;
   line-height:1;
   text-transform:uppercase;
+  color:var(--text3);
+}
+.project-palette-note{
+  margin-top:7px;
+  font-size:11px;
+  font-weight:500;
+  line-height:1.4;
   color:var(--text3);
 }
 .copy-palette-btn{
@@ -826,6 +840,7 @@ body.light .export-btn-dl{color:var(--text2)}
 }
 .scheme-tile.active .scheme-swatch::after{content:'Selected';opacity:1;transform:translateY(0)}
 .scheme-meta{
+  position:relative;
   order:-1;
   display:flex;
   flex-direction:column;
@@ -841,10 +856,52 @@ body.light .export-btn-dl{color:var(--text2)}
   color:var(--text3);
 }
 .scheme-hex{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  width:max-content;
+  max-width:100%;
   font-family:'DM Mono',monospace;
   font-size:14px;
   color:var(--text2);
   letter-spacing:.01em;
+  padding:2px 4px;
+  margin-left:-4px;
+  border-radius:6px;
+  transition:color .15s,background .15s;
+}
+.scheme-tile:not(.is-anchor) .scheme-hex{cursor:copy}
+.scheme-tile:not(.is-anchor) .scheme-hex:hover{
+  background:var(--surface2);
+  color:var(--text);
+}
+.scheme-copy{
+  position:absolute;
+  top:12px;
+  right:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  border-radius:7px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  opacity:0;
+  transform:translateY(2px);
+  color:var(--text3);
+  transition:opacity .15s,transform .15s,color .15s,background .15s,border-color .15s;
+}
+.scheme-copy svg{width:13px;height:13px}
+.scheme-tile:not(.is-anchor):hover .scheme-copy,
+.scheme-hex:hover .scheme-copy{
+  opacity:1;
+  transform:translateY(0);
+}
+.scheme-hex:hover .scheme-copy{
+  background:var(--surface2);
+  border-color:var(--border2);
+  color:var(--text);
 }
 .scheme-tile.is-anchor .scheme-label{color:var(--text2)}
 
@@ -870,6 +927,20 @@ body.light .scheme-label{
 }
 body.light .scheme-hex{
   color:#333540;
+}
+body.light .scheme-tile:not(.is-anchor) .scheme-hex:hover{
+  background:#ededf2;
+  color:#111114;
+}
+body.light .scheme-copy{
+  background:rgba(17,17,20,.04);
+  border-color:rgba(17,17,20,.06);
+  color:#8b8e9b;
+}
+body.light .scheme-hex:hover .scheme-copy{
+  background:#ffffff;
+  border-color:#d9dbe5;
+  color:#111114;
 }
 body.light .scheme-tile.is-anchor .scheme-label{
   color:#52525f;
@@ -900,7 +971,6 @@ body.light .scheme-tile.is-anchor .scheme-label{
   .header-sub{font-size:14px;margin-top:18px}
   .input-section.cp{padding:18px;border-radius:16px}
   .color-input-row{flex-wrap:wrap}
-  .gen-btn{flex:1;margin-top:4px}
   .cp-actions{align-items:flex-start;flex-direction:column;gap:10px}
   .hex-field{flex:1;min-width:0}
   .add-sec-btn,.input-note{margin-left:0}
