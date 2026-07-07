@@ -84,9 +84,15 @@
 
   <!-- Wireframe Page Preview -->
   <div class="section-label">Page Preview</div>
-  <div class="preview-tabs">
-    <button class="preview-tab active" data-tab="dark">Dark</button>
-    <button class="preview-tab" data-tab="light">Light</button>
+  <div class="preview-controls">
+    <div class="preview-tabs">
+      <button class="preview-tab active" data-tab="dark">Dark</button>
+      <button class="preview-tab" data-tab="light">Light</button>
+    </div>
+    <div class="preview-tabs preview-hierarchy-tabs" aria-label="Preview colour hierarchy">
+      <button class="preview-hierarchy active" data-hierarchy="primary">Primary-led</button>
+      <button class="preview-hierarchy" data-hierarchy="secondary">Secondary-led</button>
+    </div>
   </div>
   <div class="preview-wrap" id="pagePreview"></div>
   <div class="preview-wrap" id="lightPreview" style="display:none"></div>
@@ -128,7 +134,10 @@
   </svg>
 </button>
 
-<div class="page-footer">Pick any colour — Paletta derives the system.</div>
+<div class="page-footer">
+  <span>Pick any colour — Paletta derives the system.</span>
+  <a href="https://mars-portfolio.figma.site/" target="_blank" rel="noopener noreferrer">Made by Mars</a>
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="paletta.js?v=20260707-hex-validation"></script>

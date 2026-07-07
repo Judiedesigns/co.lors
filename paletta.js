@@ -109,6 +109,7 @@ let currentSecondaryAnchor='#2a6dc4';
 let hasSec=false;
 let autoSort=true;  // role list: sort dark → light vs. declaration order
 let contrastPair={text:'bgLight',bg:'bgDark'};
+let previewHierarchy='primary';
 
 // ── Render role gallery (editorial swatch row) ────────────────────────
 
@@ -162,10 +163,10 @@ function activeRoles(palette){
 }
 
 function contrastGrade(ratio){
-  if(ratio>=7) return {label:'AAA',tone:'strong'};
-  if(ratio>=4.5) return {label:'AA',tone:'good'};
-  if(ratio>=3) return {label:'Large',tone:'warn'};
-  return {label:'Fail',tone:'fail'};
+  if(ratio>=7) return {label:'AAA',tone:'strong',hint:'Passes enhanced text contrast'};
+  if(ratio>=4.5) return {label:'AA',tone:'good',hint:'Passes normal body text'};
+  if(ratio>=3) return {label:'Large',tone:'warn',hint:'Large text only'};
+  return {label:'Fail',tone:'fail',hint:'Not for text'};
 }
 
 function pairOptions(roles,palette,selected){
@@ -236,7 +237,7 @@ function renderContrastLab(palette){
       <div class="cl-stage-top">
         <div>
           <div class="cl-aa">Aa ${ratio.toFixed(2)}</div>
-          <div class="cl-badge cl-${grade.tone}">${grade.label}</div>
+          <div class="cl-badge cl-${grade.tone}" tabindex="0" data-hint="${grade.hint}" aria-label="${grade.label}: ${grade.hint}">${grade.label}</div>
         </div>
       </div>
       <p class="cl-sample">Use this pair for headings, body copy, buttons, and editorial moments that need clear contrast.</p>
@@ -334,8 +335,14 @@ function renderPreview(p){
   const frame=document.getElementById('pagePreview');
   const w=(op)=>`rgba(255,255,255,${op})`;
   const tod=w(.82);
-  const navCta=p.secondary||p.primary;
+  const secondaryLed=previewHierarchy==='secondary'&&p.secondary;
+  const brand=secondaryLed?p.secondary:p.primary;
+  const brandLabel=secondaryLed?'Secondary':'Primary';
+  const action=p.primary;
+  const navCta=secondaryLed?p.primary:(p.secondary||p.primary);
   const footerStrip=p.secondary||p.deep;
+  const support=secondaryLed?brand:(p.secondary||p.primary);
+  const supportLabel=secondaryLed?brandLabel:(p.secondary?'Secondary':'Primary');
 
   frame.innerHTML=`
     <div class="pv-nav" style="background:${p.bgDark}" ${ci('Background',p.bgDark)}>
@@ -343,22 +350,22 @@ function renderPreview(p){
       <div class="pv-nav-links">
         ${[1,2,3].map(()=>`<div class="pv-nav-link" style="background:${tod}"></div>`).join('')}
       </div>
-      <div class="pv-nav-cta" style="background:${navCta}" ${ci(p.secondary?'Secondary':'Primary',navCta)}></div>
+      <div class="pv-nav-cta" style="background:${navCta}" ${ci(secondaryLed?'Primary':(p.secondary?'Secondary':'Primary'),navCta)}></div>
     </div>
 
     <div class="pv-hero" style="background:${p.bgDark}" ${ci('Background',p.bgDark)}>
-      <div class="pv-hero-tag" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
+      <div class="pv-hero-tag" style="background:${brand}" ${ci(brandLabel,brand)}></div>
       <div class="pv-hero-h1a" style="background:${tod}"></div>
       <div class="pv-hero-h1b" style="background:${p.light}" ${ci('Light',p.light)}></div>
       <div class="pv-hero-p" style="background:${tod};width:58%"></div>
       <div class="pv-hero-p" style="background:${tod};width:44%"></div>
       <div class="pv-btns">
-        <div class="pv-btn" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
-        <div class="pv-btn pv-btn-ghost" style="background:${tod};border:1px solid ${tod}"></div>
+        <div class="pv-btn" style="background:${action}" ${ci('Primary',action)}></div>
+        <div class="pv-btn pv-btn-ghost" style="background:${p.secondary?ra(support,.22):tod};border:1px solid ${support}" ${ci(supportLabel,support)}></div>
       </div>
     </div>
 
-    <div class="pv-quote" style="background:${p.primary}" ${ci('Primary',p.primary)}>
+    <div class="pv-quote" style="background:${brand}" ${ci(brandLabel,brand)}>
       <div class="pv-quote-eyebrow"></div>
       <div class="pv-quote-line"></div>
       <div class="pv-quote-line" style="width:80%"></div>
@@ -369,26 +376,28 @@ function renderPreview(p){
     <div class="pv-content" style="background:${p.bgLight}" ${ci('Surface',p.bgLight)}>
       <div class="pv-content-head" style="background:${p.muted}" ${ci('Muted',p.muted)}></div>
       <div class="pv-cards">
-        ${[1,2,3].map(()=>`
+        ${[1,2,3].map((_,i)=>`
           <div class="pv-card" style="background:#fff;border-color:${p.bgDark}18">
-            <div class="pv-card-img" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
+            <div class="pv-card-img" style="background:${i===1?support:brand};opacity:${i===1?'.34':'.15'}" ${ci(i===1?supportLabel:brandLabel,i===1?support:brand)}></div>
             <div class="pv-card-line" style="background:${p.bgDark}"></div>
             <div class="pv-card-line-sm" style="background:${p.muted}"></div>
           </div>`).join('')}
       </div>
     </div>
 
+    <div style="height:4px;background:${support}" ${ci(supportLabel,support)}></div>
+
     <div class="pv-split" style="background:${p.bgLight};border-top:1px solid ${ra(p.bgDark,.08)}" ${ci('Surface',p.bgLight)}>
       <div class="pv-split-text">
-        <div style="height:5px;background:${p.primary};opacity:.2;border-radius:3px;width:44%;margin-bottom:10px"></div>
+        <div style="height:5px;background:${support};opacity:.7;border-radius:3px;width:44%;margin-bottom:10px" ${ci(supportLabel,support)}></div>
         <div style="height:8px;background:${p.bgDark};opacity:.7;border-radius:3px;width:88%;margin-bottom:4px"></div>
         <div style="height:8px;background:${p.bgDark};opacity:.7;border-radius:3px;width:66%;margin-bottom:4px"></div>
-        <div style="height:6px;background:${p.primary};opacity:.8;border-radius:3px;width:50%;font-style:italic;margin-bottom:12px"></div>
+        <div style="height:6px;background:${brand};opacity:.8;border-radius:3px;width:50%;font-style:italic;margin-bottom:12px" ${ci(brandLabel,brand)}></div>
         <div style="height:4px;background:${p.muted};opacity:.3;border-radius:2px;width:92%;margin-bottom:4px"></div>
         <div style="height:4px;background:${p.muted};opacity:.2;border-radius:2px;width:74%;margin-bottom:14px"></div>
-        <div style="height:22px;background:${p.primary};border-radius:5px;width:58px"></div>
+        <div style="height:22px;background:${action};border-radius:5px;width:58px" ${ci('Primary',action)}></div>
       </div>
-      <div class="pv-split-img" style="background:${ra(p.muted,.18)}"></div>
+      <div class="pv-split-img" style="background:${ra(support,.20)}" ${ci(supportLabel,support)}></div>
     </div>
 
     <div class="pv-deep" style="background:${p.deep}" ${ci('Deep',p.deep)}>
@@ -413,8 +422,14 @@ function renderLightPreview(p){
   const frame=document.getElementById('lightPreview');
   const d=(op)=>ra(p.bgDark,op);
   const pt=bestText(p.primary);
-  const navCta=p.secondary||p.primary;
+  const secondaryLed=previewHierarchy==='secondary'&&p.secondary;
+  const brand=secondaryLed?p.secondary:p.primary;
+  const brandLabel=secondaryLed?'Secondary':'Primary';
+  const action=p.primary;
+  const navCta=secondaryLed?p.primary:(p.secondary||p.primary);
   const footerStrip=p.secondary||p.deep;
+  const support=secondaryLed?brand:(p.secondary||p.primary);
+  const supportLabel=secondaryLed?brandLabel:(p.secondary?'Secondary':'Primary');
 
   frame.innerHTML=`
     <div class="pv-nav" style="background:#fff;border-bottom:1px solid ${d(.07)}">
@@ -422,38 +437,38 @@ function renderLightPreview(p){
       <div class="pv-nav-links">
         ${[1,2,3].map(()=>`<div class="pv-nav-link" style="background:${d(.22)}"></div>`).join('')}
       </div>
-      <div class="pv-nav-cta" style="background:${navCta}" ${ci(p.secondary?'Secondary':'Primary',navCta)}></div>
+      <div class="pv-nav-cta" style="background:${navCta}" ${ci(secondaryLed?'Primary':(p.secondary?'Secondary':'Primary'),navCta)}></div>
     </div>
 
     <div class="pv-hero" style="background:#fff">
-      <div class="pv-hero-tag" style="background:${ra(p.primary,.18)};border-radius:100px"></div>
+      <div class="pv-hero-tag" style="background:${ra(brand,.24)};border-radius:100px" ${ci(brandLabel,brand)}></div>
       <div class="pv-hero-h1a" style="background:${d(.72)}"></div>
-      <div class="pv-hero-h1b" style="background:${p.primary};opacity:.7" ${ci('Primary',p.primary)}></div>
+      <div class="pv-hero-h1b" style="background:${brand};opacity:.7" ${ci(brandLabel,brand)}></div>
       <div class="pv-hero-p" style="background:${d(.18)};width:58%"></div>
       <div class="pv-hero-p" style="background:${d(.18)};width:44%"></div>
       <div class="pv-btns">
-        <div class="pv-btn" style="background:${p.primary}" ${ci('Primary',p.primary)}></div>
-        <div class="pv-btn" style="background:transparent;border:1.5px solid ${d(.16)};opacity:.7"></div>
+        <div class="pv-btn" style="background:${action}" ${ci('Primary',action)}></div>
+        <div class="pv-btn" style="background:${ra(support,.10)};border:1.5px solid ${support};opacity:.9" ${ci(supportLabel,support)}></div>
       </div>
     </div>
 
-    <div style="background:${ra(p.primary,.07)};padding:14px 20px;display:flex;align-items:center;gap:14px">
-      ${[1,2,3].map((_,i)=>`<div style="flex:${[5,4,6][i]};height:5px;border-radius:3px;background:${ra(p.primary,.38)}"></div>`).join('')}
+    <div style="background:${ra(support,.09)};padding:14px 20px;display:flex;align-items:center;gap:14px" ${ci(supportLabel,support)}>
+      ${[1,2,3].map((_,i)=>`<div style="flex:${[5,4,6][i]};height:5px;border-radius:3px;background:${ra(support,.52)}"></div>`).join('')}
     </div>
 
     <div class="pv-content" style="background:${p.bgLight}" ${ci('Surface',p.bgLight)}>
       <div class="pv-content-head" style="background:${d(.28)}"></div>
       <div class="pv-cards">
-        ${[1,2,3].map(()=>`
+        ${[1,2,3].map((_,i)=>`
           <div class="pv-card" style="background:#fff;border-color:${d(.08)}">
-            <div class="pv-card-img" style="background:${p.primary};opacity:.18"></div>
+            <div class="pv-card-img" style="background:${i===1?support:brand};opacity:${i===1?'.34':'.18'}" ${ci(i===1?supportLabel:brandLabel,i===1?support:brand)}></div>
             <div class="pv-card-line" style="background:${d(.65)}"></div>
             <div class="pv-card-line-sm" style="background:${p.muted}" ${ci('Muted',p.muted)}></div>
           </div>`).join('')}
       </div>
     </div>
 
-    <div class="pv-quote" style="background:${p.primary}" ${ci('Primary',p.primary)}>
+    <div class="pv-quote" style="background:${brand}" ${ci(brandLabel,brand)}>
       <div class="pv-quote-eyebrow"></div>
       <div class="pv-quote-line"></div>
       <div class="pv-quote-line" style="width:74%"></div>
@@ -462,15 +477,15 @@ function renderLightPreview(p){
     </div>
 
     <div class="pv-split" style="background:#fff;border-top:1px solid ${d(.07)}">
-      <div class="pv-split-img" style="background:${ra(p.primary,.12)}"></div>
+      <div class="pv-split-img" style="background:${ra(support,.16)}" ${ci(supportLabel,support)}></div>
       <div class="pv-split-text">
-        <div style="height:5px;background:${p.primary};opacity:.22;border-radius:3px;width:44%;margin-bottom:10px"></div>
+        <div style="height:5px;background:${support};opacity:.72;border-radius:3px;width:44%;margin-bottom:10px" ${ci(supportLabel,support)}></div>
         <div style="height:8px;background:${d(.68)};border-radius:3px;width:88%;margin-bottom:4px"></div>
         <div style="height:8px;background:${d(.68)};border-radius:3px;width:66%;margin-bottom:4px"></div>
-        <div style="height:6px;background:${p.primary};opacity:.7;border-radius:3px;width:50%;margin-bottom:12px"></div>
+        <div style="height:6px;background:${brand};opacity:.7;border-radius:3px;width:50%;margin-bottom:12px" ${ci(brandLabel,brand)}></div>
         <div style="height:4px;background:${p.muted};opacity:.35;border-radius:2px;width:92%;margin-bottom:4px"></div>
         <div style="height:4px;background:${p.muted};opacity:.25;border-radius:2px;width:74%;margin-bottom:14px"></div>
-        <div style="height:22px;background:${p.primary};border-radius:5px;width:58px"></div>
+        <div style="height:22px;background:${action};border-radius:5px;width:58px" ${ci('Primary',action)}></div>
       </div>
     </div>
 
@@ -745,16 +760,17 @@ function renderSchemeRow(anchorHex){
       <span class="scheme-swatch" style="background:${hex}"></span>
       <span class="scheme-meta">
         <span class="scheme-label">${label}</span>
-        <span class="scheme-hex" title="Copy ${hex.toUpperCase()}">
+        <span class="scheme-hex">
           <span>${hex.toUpperCase()}</span>
-          ${anchor?'':'<span class="scheme-copy" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="7" height="7" rx="1.5"/><path d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"/></svg></span>'}
+          ${anchor?'':'<span class="scheme-copy" title="Copy hex" aria-label="Copy '+hex.toUpperCase()+'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="7" height="7" rx="1.5"/><path d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"/></svg></span>'}
         </span>
       </span>
     </button>`).join('');
 
   row.querySelectorAll('.scheme-tile:not(.is-anchor)').forEach(btn=>{
     btn.addEventListener('click',e=>{
-      if(e.target.closest('.scheme-hex')){
+      if(e.target.closest('.scheme-copy')){
+        e.stopPropagation();
         writeClipboard(btn.dataset.hex.toUpperCase());
         showToast('Copied '+btn.dataset.hex.toUpperCase());
         return;
@@ -938,6 +954,18 @@ document.querySelectorAll('.preview-tab').forEach(btn=>{
     const tab=btn.dataset.tab;
     document.getElementById('pagePreview').style.display=tab==='dark'?'':'none';
     document.getElementById('lightPreview').style.display=tab==='light'?'':'none';
+  });
+});
+
+document.querySelectorAll('.preview-hierarchy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.preview-hierarchy').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    previewHierarchy=btn.dataset.hierarchy;
+    if(currentPalette){
+      renderPreview(currentPalette);
+      renderLightPreview(currentPalette);
+    }
   });
 });
 
