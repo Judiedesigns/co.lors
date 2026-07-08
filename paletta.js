@@ -1012,5 +1012,23 @@ themeToggle.addEventListener('click',()=>{
   localStorage.setItem('paletta-theme',document.body.classList.contains('light')?'light':'dark');
 });
 
+// ── Page transition ──────────────────────────────────────────────────
+
+function setupPageTransitions(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.site-nav-link').forEach(link=>{
+    link.addEventListener('click',e=>{
+      if(e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0) return;
+      if(link.classList.contains('active')) return;
+      const url=new URL(link.href,window.location.href);
+      if(url.origin!==window.location.origin) return;
+      e.preventDefault();
+      document.body.classList.add('page-leaving');
+      setTimeout(()=>{window.location.href=url.href},95);
+    });
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────────────────
+setupPageTransitions();
 generate('#c4522a');

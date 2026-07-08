@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paletta — Gradient Generator</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Paletta — Gradient Generator">
+  <meta property="og:description" content="Create copyable and downloadable gradients from two colours.">
+  <meta property="og:image" content="og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="paletta.css?v=20260707-system-v1-topbar">
+  <link rel="stylesheet" href="gradients.css?v=20260707-third-colour">
+</head>
+<body class="gradient-page">
+
+<div class="wrap gradient-wrap">
+  <div class="system-topbar">
+    <div class="wordmark">Paletta</div>
+    <nav class="site-nav" aria-label="Primary">
+      <a class="site-nav-link" href="index.html">System</a>
+      <a class="site-nav-link active" href="gradients.html">Gradients</a>
+    </nav>
+    <div class="system-topbar-spacer" aria-hidden="true"></div>
+  </div>
+
+  <header class="gradient-hero">
+    <h1><strong>Gradient</strong> Generator</h1>
+  </header>
+
+  <main class="gradient-tool">
+    <div class="gradient-tool-head">
+      <h1><strong>Gradient</strong> Generator</h1>
+    </div>
+
+    <section class="gradient-preview-panel" aria-label="Gradient preview">
+      <canvas id="gradientCanvas" width="1600" height="1000"></canvas>
+      <div class="gradient-preview-overlay">
+        <span id="gradientLabel">Linear · To right top</span>
+        <button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false">Preview motion</button>
+      </div>
+    </section>
+
+    <section class="gradient-controls" aria-label="Gradient controls">
+      <div class="control-block">
+        <div class="control-head">Choose orientation</div>
+        <div class="orientation-grid" id="orientationGrid">
+          <button type="button" class="orientation-btn active" data-direction="to right top" aria-label="To right top">↗</button>
+          <button type="button" class="orientation-btn" data-direction="to right" aria-label="To right">→</button>
+          <button type="button" class="orientation-btn" data-direction="to right bottom" aria-label="To right bottom">↘</button>
+          <button type="button" class="orientation-btn" data-direction="to bottom" aria-label="To bottom">↓</button>
+          <button type="button" class="orientation-btn" data-direction="to left bottom" aria-label="To left bottom">↙</button>
+          <button type="button" class="orientation-btn" data-direction="to left" aria-label="To left">←</button>
+          <button type="button" class="orientation-btn" data-direction="to left top" aria-label="To left top">↖</button>
+          <button type="button" class="orientation-btn" data-direction="to top" aria-label="To top">↑</button>
+          <button type="button" class="orientation-btn" data-direction="135deg" aria-label="Rotate">⟳</button>
+        </div>
+      </div>
+
+      <div class="gradient-console-bottom">
+        <div class="control-block color-block">
+        <div class="control-head">Enter colours</div>
+        <div class="gradient-inputs">
+          <label class="gradient-color-field">
+            <span class="gradient-swatch" id="swatchA"></span>
+            <span class="hash">#</span>
+            <input id="colorHexA" type="text" value="051937" maxlength="7" spellcheck="false" autocomplete="off">
+            <input id="colorPickerA" type="color" value="#051937" aria-label="Pick first colour">
+          </label>
+          <label class="gradient-color-field">
+            <span class="gradient-swatch" id="swatchB"></span>
+            <span class="hash">#</span>
+            <input id="colorHexB" type="text" value="a8eb12" maxlength="7" spellcheck="false" autocomplete="off">
+            <input id="colorPickerB" type="color" value="#a8eb12" aria-label="Pick second colour">
+          </label>
+          <label class="gradient-color-field third-color-field" id="thirdColorField" hidden>
+            <span class="gradient-swatch" id="swatchC"></span>
+            <span class="hash">#</span>
+            <input id="colorHexC" type="text" value="f4ece5" maxlength="7" spellcheck="false" autocomplete="off">
+            <input id="colorPickerC" type="color" value="#f4ece5" aria-label="Pick third colour">
+          </label>
+          <button class="third-colour-toggle" id="thirdColorToggle" type="button">+ Add third colour</button>
+        </div>
+        </div>
+
+        <div class="gradient-actions">
+          <button class="gradient-primary-btn" id="randomGradientBtn" type="button">Random colours</button>
+          <button class="gradient-primary-btn" id="copyCssBtn" type="button">Copy CSS</button>
+          <button class="gradient-secondary-btn" id="downloadPngBtn" type="button">Download PNG</button>
+          <button class="gradient-secondary-btn" id="downloadWebmBtn" type="button">Download WebM</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+  <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+  </svg>
+  <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+</button>
+
+<div class="toast" id="toast"></div>
+
+<script src="gradients.js?v=20260707-third-colour"></script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paletta Gradient Reimagined Mocks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#070708;
+      --ink:#f3f3f6;
+      --muted:#a1a2ad;
+      --quiet:#62636f;
+      --line:#24242b;
+      --panel:#111114;
+      --panel2:#17171b;
+      --soft:#f4f4f7;
+      --dark:#0a0000;
+      --a:#c4522a;
+      --b:#e8946a;
+      --c:#fff2ee;
+      --grad:linear-gradient(to left top,#c4522a,#e8946a);
+    }
+    body{
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:'DM Sans',system-ui,sans-serif;
+      padding:34px;
+    }
+    .page-head{
+      max-width:1320px;
+      margin:0 auto 30px;
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:24px;
+    }
+    .page-head h1{
+      font-size:32px;
+      font-weight:650;
+      letter-spacing:0;
+    }
+    .page-head p{
+      max-width:650px;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+    .badge{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:9px 13px;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .mock-grid{
+      max-width:1320px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:26px;
+    }
+    .mock{
+      min-height:610px;
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:var(--panel);
+      overflow:hidden;
+    }
+    .mock-head{
+      height:54px;
+      padding:0 18px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      color:var(--quiet);
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .mock-head strong{color:var(--ink)}
+    .mock-head span:last-child{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 9px;
+      color:var(--muted);
+    }
+    .preview{
+      position:relative;
+      min-height:270px;
+      background:var(--grad);
+      overflow:hidden;
+    }
+    .preview::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 24% 14%,rgba(255,255,255,.22),transparent 34%),
+        linear-gradient(120deg,rgba(255,255,255,.06),transparent 50%);
+      pointer-events:none;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      min-height:34px;
+      border-radius:999px;
+      padding:0 13px;
+      background:rgba(9,9,11,.55);
+      color:#fff;
+      font-family:'DM Mono',monospace;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.02em;
+      backdrop-filter:blur(14px);
+    }
+    .ghost-chip{
+      border:1px solid rgba(255,255,255,.38);
+      background:rgba(255,255,255,.14);
+      font-family:'DM Sans',system-ui,sans-serif;
+      font-weight:800;
+    }
+    .label{
+      color:var(--quiet);
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+    }
+    .icons{
+      display:flex;
+      gap:9px;
+      flex-wrap:wrap;
+    }
+    .icon{
+      width:42px;
+      height:42px;
+      border:1px solid var(--line);
+      border-radius:13px;
+      background:var(--panel2);
+      color:var(--muted);
+      display:grid;
+      place-items:center;
+      font-size:21px;
+      font-weight:700;
+    }
+    .icon.active{
+      background:var(--soft);
+      border-color:var(--soft);
+      color:#0b0b0e;
+    }
+    .fields{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .field{
+      min-width:0;
+      min-height:52px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#101013;
+      display:flex;
+      align-items:center;
+      gap:13px;
+      padding:8px 13px;
+    }
+    .swatch{
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      background:var(--a);
+      flex:none;
+    }
+    .swatch.b{background:var(--b)}
+    .swatch.c{background:var(--c)}
+    .hex{
+      font-family:'DM Mono',monospace;
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.03em;
+      white-space:nowrap;
+    }
+    .hash{color:var(--quiet);margin-right:6px}
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      min-height:42px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:0 17px;
+      background:transparent;
+      color:var(--muted);
+      font-family:'DM Sans',system-ui,sans-serif;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.03em;
+      white-space:nowrap;
+    }
+    .btn.primary{
+      background:var(--soft);
+      border-color:var(--soft);
+      color:#08080a;
+    }
+    .code{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#0d0d10;
+      color:#c7c8d2;
+      padding:14px;
+      font:500 11px/1.65 'DM Mono',monospace;
+      white-space:pre-wrap;
+    }
+
+    .v1-body{padding:24px;display:grid;gap:18px}
+    .v1-title{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .v1-title h2{font-size:48px;font-weight:500;line-height:1;letter-spacing:0}
+    .v1-preview{border-radius:18px;min-height:300px}
+    .v1-preview .chip:first-child{position:absolute;left:22px;bottom:22px}
+    .v1-preview .ghost-chip{position:absolute;right:22px;bottom:22px}
+    .v1-controls{display:grid;gap:14px}
+    .v1-actions{justify-content:space-between}
+
+    .v2-body{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 270px;
+      min-height:556px;
+    }
+    .v2-stage{
+      padding:24px;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:18px;
+      border-right:1px solid var(--line);
+    }
+    .v2-stage h2{font-size:42px;font-weight:500;line-height:1;letter-spacing:0}
+    .v2-preview{border-radius:18px;min-height:330px}
+    .v2-preview .chip{position:absolute;left:18px;bottom:18px}
+    .v2-rail{
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      justify-content:space-between;
+    }
+    .v2-panel{display:grid;gap:12px}
+    .v2 .icons{display:grid;grid-template-columns:repeat(3,1fr)}
+    .v2 .icon{width:100%}
+    .v2 .fields{grid-template-columns:1fr}
+    .v2 .actions{display:grid;grid-template-columns:1fr}
+
+    .v3-body{padding:24px;display:grid;gap:18px}
+    .v3-top{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:16px;
+      align-items:center;
+    }
+    .v3-top h2{font-size:40px;font-weight:500;line-height:1;letter-spacing:0}
+    .v3-preview{border-radius:18px;min-height:245px}
+    .v3-console{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+    }
+    .v3-console-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:14px;
+      padding:15px;
+      align-items:center;
+      border-bottom:1px solid var(--line);
+    }
+    .v3-console-row:last-child{border-bottom:0}
+    .v3 .icons{justify-content:flex-end}
+    .v3 .fields{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .v3 .field:last-child{opacity:.58}
+
+    .v4-body{padding:24px;display:grid;gap:18px}
+    .v4-layout{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+    .v4-left,.v4-right{
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+    .v4-title h2{font-size:42px;font-weight:500;line-height:1;letter-spacing:0}
+    .v4-title p{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.45}
+    .v4-preview{border-radius:18px;min-height:250px}
+    .v4-export{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      display:grid;
+      gap:14px;
+      background:#101013;
+    }
+    .v4 .fields{grid-template-columns:1fr}
+    .v4 .actions{display:grid;grid-template-columns:1fr 1fr}
+
+    @media(max-width:1060px){
+      body{padding:20px}
+      .mock-grid{grid-template-columns:1fr}
+      .v2-body,.v4-layout{grid-template-columns:1fr}
+      .v2-stage{border-right:0;border-bottom:1px solid var(--line)}
+      .v2-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:620px){
+      .page-head{display:block}
+      .badge{display:inline-flex;margin-top:16px}
+      .mock{min-height:0}
+      .v1-title,.v3-top{display:grid;grid-template-columns:1fr}
+      .v1-title h2,.v2-stage h2,.v3-top h2,.v4-title h2{font-size:34px}
+      .fields,.v3 .fields,.v4 .actions,.v2-rail{grid-template-columns:1fr}
+      .v1-actions,.actions{display:grid;grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header class="page-head">
+    <div>
+      <h1>Gradient Generator Reimagined</h1>
+      <p>Four mockup directions for the current orange gradient tool. These are review concepts only; production stays unchanged.</p>
+    </div>
+    <span class="badge">Mockups only</span>
+  </header>
+
+  <main class="mock-grid">
+    <section class="mock v1">
+      <div class="mock-head"><strong>Iteration 1</strong><span>Polished Current</span></div>
+      <div class="v1-body">
+        <div class="v1-title">
+          <h2>Gradient Generator</h2>
+          <button class="btn primary">Copy CSS</button>
+        </div>
+        <div class="preview v1-preview">
+          <span class="chip">Linear · To Left Top</span>
+          <span class="chip ghost-chip">Preview motion</span>
+        </div>
+        <div class="v1-controls">
+          <div class="label">Choose orientation</div>
+          <div class="icons">
+            <span class="icon">↗</span><span class="icon">→</span><span class="icon">↘</span><span class="icon">↓</span><span class="icon">↙</span><span class="icon">←</span><span class="icon active">↖</span><span class="icon">↑</span><span class="icon">⟳</span>
+          </div>
+          <div class="label">Enter colours</div>
+          <div class="fields">
+            <div class="field"><span class="swatch"></span><span class="hex"><span class="hash">#</span>c4522a</span></div>
+            <div class="field"><span class="swatch b"></span><span class="hex"><span class="hash">#</span>e8946a</span></div>
+          </div>
+          <div class="actions v1-actions">
+            <button class="btn primary">Random colours</button>
+            <button class="btn">Download PNG</button>
+            <button class="btn">Download WebM</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mock v2">
+      <div class="mock-head"><strong>Iteration 2</strong><span>Studio Rail</span></div>
+      <div class="v2-body">
+        <div class="v2-stage">
+          <h2>Gradient Generator</h2>
+          <div class="preview v2-preview"><span class="chip">Linear · To Left Top</span></div>
+          <div class="actions">
+            <button class="btn primary">Copy CSS</button>
+            <button class="btn">Preview motion</button>
+          </div>
+        </div>
+        <aside class="v2-rail">
+          <div class="v2-panel">
+            <div class="label">Orientation</div>
+            <div class="icons">
+              <span class="icon">↗</span><span class="icon">→</span><span class="icon">↘</span><span class="icon">↓</span><span class="icon">↙</span><span class="icon">←</span><span class="icon active">↖</span><span class="icon">↑</span><span class="icon">⟳</span>
+            </div>
+          </div>
+          <div class="v2-panel">
+            <div class="label">Colours</div>
+            <div class="fields">
+              <div class="field"><span class="swatch"></span><span class="hex"><span class="hash">#</span>c4522a</span></div>
+              <div class="field"><span class="swatch b"></span><span class="hex"><span class="hash">#</span>e8946a</span></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn">Download PNG</button>
+            <button class="btn">Download WebM</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="mock v3">
+      <div class="mock-head"><strong>Iteration 3</strong><span>Compact Console</span></div>
+      <div class="v3-body">
+        <div class="v3-top">
+          <h2>Gradient Generator</h2>
+          <div class="actions"><button class="btn primary">Random colours</button><button class="btn primary">Copy CSS</button></div>
+        </div>
+        <div class="preview v3-preview">
+          <span class="chip" style="position:absolute;left:18px;bottom:18px">Linear · To Left Top</span>
+          <span class="chip ghost-chip" style="position:absolute;right:18px;bottom:18px">Preview motion</span>
+        </div>
+        <div class="v3-console">
+          <div class="v3-console-row">
+            <div class="label">Orientation</div>
+            <div class="icons">
+              <span class="icon">↗</span><span class="icon">→</span><span class="icon">↘</span><span class="icon">↓</span><span class="icon">↙</span><span class="icon">←</span><span class="icon active">↖</span><span class="icon">↑</span><span class="icon">⟳</span>
+            </div>
+          </div>
+          <div class="v3-console-row">
+            <div class="fields">
+              <div class="field"><span class="swatch"></span><span class="hex"><span class="hash">#</span>c4522a</span></div>
+              <div class="field"><span class="swatch b"></span><span class="hex"><span class="hash">#</span>e8946a</span></div>
+              <div class="field"><span class="swatch c"></span><span class="hex">+ Add third</span></div>
+            </div>
+            <div class="actions"><button class="btn">PNG</button><button class="btn">WebM</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mock v4">
+      <div class="mock-head"><strong>Iteration 4</strong><span>Export Workbench</span></div>
+      <div class="v4-body">
+        <div class="v4-layout">
+          <div class="v4-left">
+            <div class="v4-title">
+              <h2>Gradient Generator</h2>
+              <p>Build, copy, and export the gradient from one focused work surface.</p>
+            </div>
+            <div class="preview v4-preview"><span class="chip" style="position:absolute;left:18px;bottom:18px">Linear · To Left Top</span></div>
+            <div class="icons">
+              <span class="icon">↗</span><span class="icon">→</span><span class="icon">↘</span><span class="icon">↓</span><span class="icon">↙</span><span class="icon">←</span><span class="icon active">↖</span><span class="icon">↑</span><span class="icon">⟳</span>
+            </div>
+          </div>
+          <div class="v4-right">
+            <div class="label">Colours</div>
+            <div class="fields">
+              <div class="field"><span class="swatch"></span><span class="hex"><span class="hash">#</span>c4522a</span></div>
+              <div class="field"><span class="swatch b"></span><span class="hex"><span class="hash">#</span>e8946a</span></div>
+            </div>
+            <div class="v4-export">
+              <div class="label">CSS output</div>
+              <pre class="code">background-image:
+  linear-gradient(to left top, #c4522a, #e8946a);</pre>
+              <div class="actions">
+                <button class="btn primary">Copy CSS</button>
+                <button class="btn">Download PNG</button>
+                <button class="btn">Download WebM</button>
+                <button class="btn">Randomise</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
